@@ -1,4 +1,4 @@
-import { Shield } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 
 export function Footer() {
   return (
@@ -8,7 +8,7 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600">
-                <Shield className="h-4 w-4 text-white" />
+                <ShieldCheck className="h-4 w-4 text-white" />
               </div>
               <span className="font-bold text-gray-900">Contrôle Parental</span>
             </div>

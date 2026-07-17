@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
 import { AuthLayout } from '@/components/layout/AuthLayout'
 import { Button } from '@/components/ui/Button'
@@ -35,12 +36,16 @@ export function RegisterPage() {
 
   return (
     <AuthLayout>
-      <div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
         <h1 className="text-2xl font-bold text-gray-900">Créer un compte</h1>
         <p className="mt-2 text-sm text-gray-600">
           Commencez votre essai gratuit. Aucune carte requise.
         </p>
-      </div>
+      </motion.div>
 
       {generalError && (
         <div className="mt-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
@@ -49,7 +54,12 @@ export function RegisterPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+      <motion.form
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
+        onSubmit={handleSubmit} className="mt-8 space-y-5"
+      >
         <Input
           label="Nom complet"
           type="text"
@@ -114,14 +124,19 @@ export function RegisterPage() {
         <Button type="submit" size="lg" loading={loading} className="w-full">
           Créer mon compte
         </Button>
-      </form>
+      </motion.form>
 
-      <p className="mt-8 text-center text-sm text-gray-600">
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="mt-8 text-center text-sm text-gray-600"
+      >
         Déjà un compte ?{' '}
         <Link to="/login" className="font-semibold text-brand-600 hover:text-brand-700">
           Se connecter
         </Link>
-      </p>
+      </motion.p>
     </AuthLayout>
   )
 }
