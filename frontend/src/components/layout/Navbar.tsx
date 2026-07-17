@@ -1,9 +1,21 @@
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { ShieldCheck } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import { ShieldCheck, ChevronDown, LogOut, LayoutDashboard } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function Navbar() {
+  const { user, token, logout } = useAuth()
+  const navigate = useNavigate()
+  const [profileOpen, setProfileOpen] = useState(false)
+
+  const handleLogout = async () => {
+    await logout()
+    setProfileOpen(false)
+    navigate('/')
+  }
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -16 }}
@@ -31,14 +43,66 @@ export function Navbar() {
           </a>
         </nav>
 
-        <div className="flex items-center gap-3">
-          <Link to="/login">
-            <Button variant="ghost" size="sm">Connexion</Button>
-          </Link>
-          <Link to="/register">
-            <Button size="sm">Essai gratuit</Button>
-          </Link>
-        </div>
+        {token && user ? (
+          <div className="relative">
+            <button
+              onClick={() => setProfileOpen((s) => !s)}
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-gray-100"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
+                {user.name?.charAt(0) || '?'}
+              </div>
+              <span className="hidden text-sm font-medium text-gray-700 sm:block">
+                {user.name}
+              </span>
+              <ChevronDown className="h-4 w-4 text-gray-400" />
+            </button>
+
+            <AnimatePresence>
+              {profileOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setProfileOpen(false)} />
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-full z-20 mt-2 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
+                  >
+                    <div className="border-b border-gray-100 px-4 py-2">
+                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      <p className="truncate text-xs text-gray-500">{user.email}</p>
+                    </div>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Tableau de bord
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Se déconnecter
+                    </button>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <Link to="/login">
+              <Button variant="ghost" size="sm">Connexion</Button>
+            </Link>
+            <Link to="/register">
+              <Button size="sm">Essai gratuit</Button>
+            </Link>
+          </div>
+        )}
       </div>
     </motion.header>
   )
