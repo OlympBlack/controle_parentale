@@ -11,7 +11,6 @@ export function RegisterPage() {
   const { register, loading } = useAuth()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
   const [errors, setErrors] = useState<Record<string, string[]>>({})
@@ -23,7 +22,7 @@ export function RegisterPage() {
     setGeneralError('')
 
     try {
-      await register(name, email, password, passwordConfirmation, phone || undefined)
+      await register(name, email, password, passwordConfirmation)
       navigate('/dashboard')
     } catch (err: any) {
       if (err.response?.status === 422) {
@@ -73,17 +72,6 @@ export function RegisterPage() {
           error={errors.email?.[0]}
           autoComplete="email"
           required
-        />
-
-        <Input
-          label="Téléphone (optionnel)"
-          type="tel"
-          name="phone"
-          placeholder="+33 6 12 34 56 78"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          error={errors.phone?.[0]}
-          autoComplete="tel"
         />
 
         <Input
