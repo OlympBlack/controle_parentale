@@ -116,8 +116,8 @@ export function RegisterPage() {
           />
           <span>
             J'accepte les{' '}
-            <a href="#" className="font-medium text-brand-600 hover:text-brand-700">CGU</a> et la{' '}
-            <a href="#" className="font-medium text-brand-600 hover:text-brand-700">politique de confidentialité</a>
+            <Link to="/cgu" className="font-medium text-brand-600 hover:text-brand-700">CGU</Link> et la{' '}
+            <Link to="/confidentialite" className="font-medium text-brand-600 hover:text-brand-700">politique de confidentialité</Link>
           </span>
         </label>
 

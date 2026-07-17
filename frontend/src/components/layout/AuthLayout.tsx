@@ -6,8 +6,8 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left side - Form */}
-      <div className="flex w-full flex-col justify-center overflow-y-auto px-4 py-12 sm:px-6 lg:w-1/2 lg:px-8">
-        <div className="mx-auto w-full max-w-md">
+      <div className="flex w-full flex-col overflow-y-auto px-4 py-8 sm:px-6 lg:w-1/2 lg:px-8">
+        <div className="mx-auto my-auto w-full max-w-md">
           <Link to="/" className="mb-8 flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600">
               <ShieldCheck className="h-5 w-5 text-white" />
