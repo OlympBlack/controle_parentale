@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Traits\ApiResponse;
-use App\Models\User;
+use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use OpenApi\Attributes as OA;
 
 class AuthController extends Controller
 {
     use ApiResponse;
+
+    public function __construct(private readonly AuthService $authService) {}
 
     #[OA\Post(
         path: '/api/register',
@@ -25,13 +28,15 @@ class AuthController extends Controller
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['name', 'email', 'password'],
+            required: ['name', 'email', 'password', 'password_confirmation'],
             properties: [
                 new OA\Property(property: 'name', type: 'string', example: 'Jean Dupont'),
                 new OA\Property(property: 'email', type: 'string', format: 'email', example: 'jean@exemple.com'),
                 new OA\Property(property: 'phone', type: 'string', example: '+33612345678'),
-                new OA\Property(property: 'password', type: 'string', format: 'password', example: 'password123'),
-                new OA\Property(property: 'password_confirmation', type: 'string', format: 'password', example: 'password123'),
+                new OA\Property(property: 'password', type: 'string', format: 'password', example: 'P@ssw0rd!'),
+                new OA\Property(property: 'password_confirmation', type: 'string', format: 'password', example: 'P@ssw0rd!'),
+                new OA\Property(property: 'locale', type: 'string', example: 'fr'),
+                new OA\Property(property: 'timezone', type: 'string', example: 'Europe/Paris'),
                 new OA\Property(property: 'device_name', type: 'string', example: 'Chrome Browser'),
             ]
         )
@@ -55,20 +60,15 @@ class AuthController extends Controller
         )
     )]
     #[OA\Response(response: 422, ref: '#/components/responses/ValidationError')]
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => $request->password,
-        ]);
-
-        $deviceName = $request->device_name ?? $request->userAgent() ?? 'unknown';
-        $token = $user->createToken($deviceName)->plainTextToken;
+        $result = $this->authService->register(
+            $request->validated(),
+            $request->device_name ?? $request->userAgent()
+        );
 
         return $this->success(
-            ['user' => new UserResource($user), 'token' => $token],
+            ['user' => new UserResource($result['user']), 'token' => $result['token']],
             'Compte créé avec succès',
             201
         );
@@ -78,7 +78,7 @@ class AuthController extends Controller
         path: '/api/login',
         tags: ['Auth'],
         summary: 'Connexion utilisateur',
-        description: 'Authentifie un utilisateur et retourne un token Bearer',
+        description: 'Authentifie un utilisateur et retourne un token Bearer. Limité à 10 tentatives par minute.',
         operationId: 'login'
     )]
     #[OA\RequestBody(
@@ -87,7 +87,7 @@ class AuthController extends Controller
             required: ['email', 'password'],
             properties: [
                 new OA\Property(property: 'email', type: 'string', format: 'email', example: 'jean@exemple.com'),
-                new OA\Property(property: 'password', type: 'string', format: 'password', example: 'password123'),
+                new OA\Property(property: 'password', type: 'string', format: 'password', example: 'P@ssw0rd!'),
                 new OA\Property(property: 'device_name', type: 'string', example: 'Chrome Browser'),
             ]
         )
@@ -111,25 +111,32 @@ class AuthController extends Controller
         )
     )]
     #[OA\Response(response: 401, ref: '#/components/responses/Unauthorized')]
-    public function login(LoginRequest $request)
+    #[OA\Response(response: 403, description: 'Compte suspendu ou inactif')]
+    #[OA\Response(response: 429, description: 'Trop de tentatives')]
+    public function login(LoginRequest $request): JsonResponse
     {
-        $user = User::where('email', $request->email)->first();
+        $result = $this->authService->login(
+            $request->email,
+            $request->password,
+            $request->device_name ?? $request->userAgent()
+        );
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return $this->error('Identifiants incorrects', 401);
+        if ($result === null) {
+            return $this->error('Identifiants incorrects.', 401);
         }
 
-        if ($user->status !== 'active') {
-            return $this->error('Votre compte est ' . $user->status, 403);
+        $user = $result['user'];
+
+        if ($user->status === 'suspended') {
+            return $this->error('Votre compte a été suspendu. Contactez le support.', 403);
         }
 
-        $user->update(['last_login_at' => now()]);
-
-        $deviceName = $request->device_name ?? $request->userAgent() ?? 'unknown';
-        $token = $user->createToken($deviceName)->plainTextToken;
+        if ($user->status === 'pending') {
+            return $this->error('Votre compte est en attente de validation.', 403);
+        }
 
         return $this->success(
-            ['user' => new UserResource($user), 'token' => $token],
+            ['user' => new UserResource($user), 'token' => $result['token']],
             'Connexion réussie'
         );
     }
@@ -137,18 +144,71 @@ class AuthController extends Controller
     #[OA\Post(
         path: '/api/logout',
         tags: ['Auth'],
-        summary: 'Déconnexion utilisateur',
-        description: 'Révoque le token courant',
+        summary: 'Déconnexion (token courant)',
+        description: 'Révoque uniquement le token utilisé pour cette requête',
         operationId: 'logout',
         security: [['sanctum' => []]]
     )]
     #[OA\Response(response: 200, ref: '#/components/responses/Success')]
     #[OA\Response(response: 401, ref: '#/components/responses/Unauthorized')]
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $this->authService->revokeCurrentToken($request->user());
 
-        return $this->success(null, 'Déconnexion réussie');
+        return $this->success(null, 'Déconnexion réussie.');
+    }
+
+    #[OA\Post(
+        path: '/api/logout-all',
+        tags: ['Auth'],
+        summary: 'Déconnexion de tous les appareils',
+        description: 'Révoque tous les tokens de l\'utilisateur (utile en cas de vol d\'appareil)',
+        operationId: 'logoutAll',
+        security: [['sanctum' => []]]
+    )]
+    #[OA\Response(response: 200, ref: '#/components/responses/Success')]
+    #[OA\Response(response: 401, ref: '#/components/responses/Unauthorized')]
+    public function logoutAll(Request $request): JsonResponse
+    {
+        $this->authService->revokeAllTokens($request->user());
+
+        return $this->success(null, 'Déconnecté de tous les appareils.');
+    }
+
+    #[OA\Post(
+        path: '/api/auth/password',
+        tags: ['Auth'],
+        summary: 'Changer le mot de passe',
+        description: 'Vérifie le mot de passe actuel et le remplace. Révoque toutes les autres sessions.',
+        operationId: 'changePassword',
+        security: [['sanctum' => []]]
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['current_password', 'password', 'password_confirmation'],
+            properties: [
+                new OA\Property(property: 'current_password', type: 'string', format: 'password'),
+                new OA\Property(property: 'password', type: 'string', format: 'password'),
+                new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+            ]
+        )
+    )]
+    #[OA\Response(response: 200, ref: '#/components/responses/Success')]
+    #[OA\Response(response: 422, ref: '#/components/responses/ValidationError')]
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        $changed = $this->authService->changePassword(
+            $request->user(),
+            $request->current_password,
+            $request->password
+        );
+
+        if (!$changed) {
+            return $this->error('Le mot de passe actuel est incorrect.', 422);
+        }
+
+        return $this->success(null, 'Mot de passe modifié. Les autres sessions ont été révoquées.');
     }
 
     #[OA\Get(
@@ -171,7 +231,7 @@ class AuthController extends Controller
         )
     )]
     #[OA\Response(response: 401, ref: '#/components/responses/Unauthorized')]
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
         return $this->success(new UserResource($request->user()), 'Profil utilisateur');
     }

@@ -14,9 +14,17 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'email'       => ['required', 'string', 'email:rfc,dns', 'max:255', 'lowercase'],
+            'password'    => ['required', 'string', 'min:8', 'max:72'],
             'device_name' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.lowercase'   => 'L\'adresse e-mail doit être en minuscules.',
+            'password.max'      => 'Le mot de passe ne peut pas dépasser 72 caractères.',
         ];
     }
 }

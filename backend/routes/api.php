@@ -17,11 +17,16 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public routes (no authentication required)
+| Public routes — rate limited
 |--------------------------------------------------------------------------
 */
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+});
+
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -30,8 +35,10 @@ Route::post('/login', [AuthController::class, 'login']);
 */
 Route::middleware('auth:sanctum')->group(function () {
     // Auth
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout',         [AuthController::class, 'logout']);
+    Route::post('/logout-all',     [AuthController::class, 'logoutAll']);
+    Route::post('/auth/password',  [AuthController::class, 'changePassword']);
+    Route::get('/me',              [AuthController::class, 'me']);
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'show']);
