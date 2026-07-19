@@ -10,6 +10,7 @@ use App\Http\Traits\ApiResponse;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use OpenApi\Attributes as OA;
 
 class AuthController extends Controller
@@ -233,6 +234,13 @@ class AuthController extends Controller
     #[OA\Response(response: 401, ref: '#/components/responses/Unauthorized')]
     public function me(Request $request): JsonResponse
     {
-        return $this->success(new UserResource($request->user()), 'Profil utilisateur');
+        $user = $request->user();
+        $cacheKey = "user:{$user->id}:profile";
+
+        $data = Cache::remember($cacheKey, 60, function () use ($user) {
+            return new UserResource($user);
+        });
+
+        return $this->success($data, 'Profil utilisateur');
     }
 }

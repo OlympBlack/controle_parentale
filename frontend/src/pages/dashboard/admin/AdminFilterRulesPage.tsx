@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type FormEvent } from 'react'
+import { useState, useEffect, useCallback, useRef, type FormEvent } from 'react'
 import type { AxiosError } from 'axios'
 import {
   Shield,
@@ -440,9 +440,14 @@ export function AdminFilterRulesPage() {
     } finally {
       setLoading(false)
     }
-  }, [activeFamily])
+  }, [activeFamily?.id])
 
-  useEffect(() => { void load() }, [load])
+  const loadRef = useRef(false)
+  useEffect(() => {
+    if (loadRef.current) return
+    loadRef.current = true
+    void load().finally(() => { loadRef.current = false })
+  }, [load])
 
   const childMap = new Map(children.map((c) => [c.id, c.full_name || c.first_name]))
   const filteredRules = filterChild === 'all' ? rules : rules.filter((r) => r.child_id === filterChild)

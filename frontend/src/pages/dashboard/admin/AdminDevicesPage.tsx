@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type FormEvent } from 'react'
+import { useState, useEffect, useCallback, useRef, type FormEvent } from 'react'
 import type { AxiosError } from 'axios'
 import {
   Smartphone,
@@ -426,9 +426,14 @@ export function AdminDevicesPage() {
     } finally {
       setLoading(false)
     }
-  }, [activeFamily])
+  }, [activeFamily?.id])
 
-  useEffect(() => { void load() }, [load])
+  const loadRef = useRef(false)
+  useEffect(() => {
+    if (loadRef.current) return
+    loadRef.current = true
+    void load().finally(() => { loadRef.current = false })
+  }, [load])
 
   const handleSaved = (device: Device, isEdit: boolean) => {
     if (isEdit) {

@@ -48,7 +48,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearAuthRef = useRef(clearAuth)
   clearAuthRef.current = clearAuth
 
+  const initRef = useRef(false)
+
   useEffect(() => {
+    if (initRef.current) return
+    initRef.current = true
+
     const token = localStorage.getItem(TOKEN_KEY)
 
     if (!token) {

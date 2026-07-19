@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -58,9 +59,13 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
     }
   }, [resolveActiveFamily])
 
+  const loadFamiliesRef = useRef(false)
+
   useEffect(() => {
     if (isAuthenticated) {
-      void loadFamilies()
+      if (loadFamiliesRef.current) return
+      loadFamiliesRef.current = true
+      void loadFamilies().finally(() => { loadFamiliesRef.current = false })
     } else {
       setFamilies([])
       setActiveFamilyState(null)

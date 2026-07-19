@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type FormEvent } from 'react'
+import { useState, useEffect, useCallback, useRef, type FormEvent } from 'react'
 import type { AxiosError } from 'axios'
 import {
   Users,
@@ -423,9 +423,14 @@ export function AdminChildrenPage() {
     } finally {
       setLoading(false)
     }
-  }, [activeFamily])
+  }, [activeFamily?.id])
 
-  useEffect(() => { void load() }, [load])
+  const loadRef = useRef(false)
+  useEffect(() => {
+    if (loadRef.current) return
+    loadRef.current = true
+    void load().finally(() => { loadRef.current = false })
+  }, [load])
 
   const handleSaved = (child: Child, isEdit: boolean) => {
     if (isEdit) {

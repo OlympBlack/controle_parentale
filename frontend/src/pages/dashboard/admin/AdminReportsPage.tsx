@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   BarChart3,
   FileText,
@@ -271,9 +271,14 @@ export function AdminReportsPage() {
     } finally {
       setLoading(false)
     }
-  }, [activeFamily])
+  }, [activeFamily?.id])
 
-  useEffect(() => { void load() }, [load])
+  const loadRef = useRef(false)
+  useEffect(() => {
+    if (loadRef.current) return
+    loadRef.current = true
+    void load().finally(() => { loadRef.current = false })
+  }, [load])
 
   const childMap = new Map(children.map((c) => [c.id, c.full_name || c.first_name]))
   const filteredReports = reports.filter((r) => {

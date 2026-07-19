@@ -9,6 +9,7 @@ use App\Http\Resources\FamilyResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\Family;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use OpenApi\Attributes as OA;
 
 class FamilyController extends Controller
@@ -42,12 +43,16 @@ class FamilyController extends Controller
     public function index(Request $request)
     {
         $perPage = min((int) $request->query('per_page', 15), 100);
+        $userId = $request->user()->id;
+        $cacheKey = "user:{$userId}:families:per_page:{$perPage}";
 
-        $families = $request->user()
-            ->families()
-            ->with('owner')
-            ->withCount('children')
-            ->paginate($perPage);
+        $families = Cache::remember($cacheKey, 60, function () use ($request, $perPage) {
+            return $request->user()
+                ->families()
+                ->with('owner')
+                ->withCount('children')
+                ->paginate($perPage);
+        });
 
         return FamilyResource::collection($families)
             ->additional([

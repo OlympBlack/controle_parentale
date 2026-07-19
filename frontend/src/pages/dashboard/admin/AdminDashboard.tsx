@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   Shield,
   Users,
@@ -66,9 +66,14 @@ export function AdminDashboard() {
     } finally {
       setLoading(false)
     }
-  }, [activeFamily])
+  }, [activeFamily?.id])
 
-  useEffect(() => { void load() }, [load])
+  const loadRef = useRef(false)
+  useEffect(() => {
+    if (loadRef.current) return
+    loadRef.current = true
+    void load().finally(() => { loadRef.current = false })
+  }, [load])
 
   const avgScore = stats && stats.recentReports.length > 0
     ? Math.round(stats.recentReports.reduce((sum, r) => sum + (r.digital_health_score ?? 0), 0) / stats.recentReports.length)
