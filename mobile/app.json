@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "SafeKid",
+    "slug": "safekid-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "safekid",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#3b5bf9"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.safekid.mobile"
+    },
+    "android": {
+      "package": "com.safekid.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#3b5bf9",
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "splash": {
+        "image": "./assets/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#3b5bf9"
+      }
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-status-bar",
+      [
+        "expo-notifications",
+        {
+          "color": "#3b5bf9"
+        }
+      ],
+      "expo-splash-screen"
+    ],
+    "extra": {
+      "apiUrl": "http://localhost:8000/api"
+    }
+  }
+}
