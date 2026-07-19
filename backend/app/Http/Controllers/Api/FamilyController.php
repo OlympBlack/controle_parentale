@@ -24,6 +24,7 @@ class FamilyController extends Controller
         security: [['sanctum' => []]]
     )]
     #[OA\Parameter(name: 'page', in: 'query', description: 'Numéro de page', schema: new OA\Schema(type: 'integer', default: 1))]
+    #[OA\Parameter(name: 'per_page', in: 'query', description: 'Résultats par page (max 100)', schema: new OA\Schema(type: 'integer', default: 15, maximum: 100))]
     #[OA\Response(
         response: 200,
         description: 'Liste paginée des familles',
@@ -40,13 +41,19 @@ class FamilyController extends Controller
     #[OA\Response(response: 401, ref: '#/components/responses/Unauthorized')]
     public function index(Request $request)
     {
+        $perPage = min((int) $request->query('per_page', 15), 100);
+
         $families = $request->user()
             ->families()
             ->with('owner')
             ->withCount('children')
-            ->paginate(15);
+            ->paginate($perPage);
 
-        return $this->paginated($families, 'Liste des familles');
+        return FamilyResource::collection($families)
+            ->additional([
+                'success' => true,
+                'message' => 'Liste des familles',
+            ]);
     }
 
     #[OA\Post(

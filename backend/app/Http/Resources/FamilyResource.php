@@ -16,10 +16,11 @@ class FamilyResource extends JsonResource
             'plan'           => $this->plan,
             'owner'          => new UserResource($this->whenLoaded('owner')),
             'children_count' => $this->whenCounted('children'),
-            'my_role'        => $this->whenPivotLoaded('family_user', function () {
-                $role = $this->pivot->role;
-                return $role instanceof UserRole ? $role->value : $role;
-            }),
+            'my_role'        => $this->pivot
+                ? ($this->pivot->role instanceof UserRole
+                    ? $this->pivot->role->value
+                    : $this->pivot->role)
+                : null,
             'created_at'     => $this->created_at?->toIso8601String(),
             'updated_at'     => $this->updated_at?->toIso8601String(),
         ];

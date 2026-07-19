@@ -32,6 +32,6 @@ export function DashboardRouter() {
     case 'admin':        return <Navigate to="/dashboard/admin" replace />
     case 'gestionnaire': return <Navigate to="/dashboard/gestionnaire" replace />
     case 'observateur':  return <Navigate to="/dashboard/observateur" replace />
-    default:             return <Navigate to="/login" replace />
+    default:             return <Navigate to="/onboarding" replace />
   }
 }

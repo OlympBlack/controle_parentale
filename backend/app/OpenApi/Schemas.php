@@ -29,6 +29,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'plan', type: 'string', enum: ['free', 'premium'], example: 'free'),
         new OA\Property(property: 'owner', ref: '#/components/schemas/User'),
         new OA\Property(property: 'children_count', type: 'integer', example: 2),
+        new OA\Property(property: 'my_role', type: 'string', nullable: true, enum: ['admin', 'gestionnaire', 'observateur'], description: 'Rôle de l\'utilisateur authentifié dans cette famille (présent uniquement dans le contexte pivot)'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ],

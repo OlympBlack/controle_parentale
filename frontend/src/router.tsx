@@ -6,6 +6,7 @@ import { LandingPage } from '@/pages/LandingPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { RegisterPage } from '@/pages/auth/RegisterPage'
 import { DashboardRouter } from '@/pages/dashboard/DashboardRouter'
+import { OnboardingPage } from '@/pages/OnboardingPage'
 import { AdminLayout } from '@/pages/dashboard/admin/AdminLayout'
 import { AdminDashboard } from '@/pages/dashboard/admin/AdminDashboard'
 import { GestionnaireLayout } from '@/pages/dashboard/gestionnaire/GestionnaireLayout'
@@ -95,14 +96,9 @@ export function AppRouter() {
             path="/onboarding"
             element={
               <ProtectedRoute>
-                <div className="flex h-screen items-center justify-center bg-white">
-                  <div className="max-w-md text-center">
-                    <h1 className="text-2xl font-bold text-gray-900">Créez votre famille</h1>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Vous n'appartenez encore à aucune famille. Créez-en une pour commencer.
-                    </p>
-                  </div>
-                </div>
+                <FamilyProvider>
+                  <OnboardingPage />
+                </FamilyProvider>
               </ProtectedRoute>
             }
           />
