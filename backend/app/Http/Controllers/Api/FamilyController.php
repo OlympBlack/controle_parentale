@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRole;
 use App\Http\Requests\StoreFamilyRequest;
 use App\Http\Requests\UpdateFamilyRequest;
 use App\Http\Resources\FamilyResource;
@@ -85,7 +86,10 @@ class FamilyController extends Controller
             'owner_id' => $request->user()->id,
         ]);
 
-        $family->users()->attach($request->user()->id, ['joined_at' => now()]);
+        $family->users()->attach($request->user()->id, [
+            'role'      => UserRole::Admin->value,
+            'joined_at' => now(),
+        ]);
 
         return $this->success(new FamilyResource($family->load('owner')), 'Famille créée', 201);
     }

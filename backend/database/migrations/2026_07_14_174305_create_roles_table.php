@@ -1,24 +1,15 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
+/**
+ * Les rôles sont gérés par l'enum PHP App\Enums\UserRole.
+ * La colonne `role` est stockée directement dans `family_user` (string).
+ * Cette migration est intentionnellement vide.
+ */
 return new class extends Migration
 {
-    public function up(): void
-    {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->text('description')->nullable();
-            $table->timestamps();
-        });
-    }
+    public function up(): void {}
 
-    public function down(): void
-    {
-        Schema::dropIfExists('roles');
-    }
+    public function down(): void {}
 };

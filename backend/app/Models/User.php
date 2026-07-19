@@ -38,6 +38,9 @@ class User extends Authenticatable
     }
 
     public function families() {
-        return $this->belongsToMany(Family::class)->withPivot('role_id', 'invited_by', 'joined_at')->withTimestamps();
+        return $this->belongsToMany(Family::class)
+            ->withPivot('role', 'invited_by', 'joined_at')
+            ->withTimestamps()
+            ->withCasts(['role' => \App\Enums\UserRole::class]);
     }
 }

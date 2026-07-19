@@ -13,7 +13,10 @@ class Family extends Model
     }
 
     public function users() {
-        return $this->belongsToMany(User::class)->withPivot('role_id', 'invited_by', 'joined_at')->withTimestamps();
+        return $this->belongsToMany(User::class)
+            ->withPivot('role', 'invited_by', 'joined_at')
+            ->withTimestamps()
+            ->withCasts(['role' => \App\Enums\UserRole::class]);
     }
 
     public function children() {
