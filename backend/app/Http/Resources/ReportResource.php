@@ -19,6 +19,12 @@ class ReportResource extends JsonResource
             'statistics' => $this->statistics,
             'file_path' => $this->file_path,
             'generated_at' => $this->generated_at?->toIso8601String(),
+            'child' => $this->whenLoaded('child', fn () => [
+                'id' => $this->child->id,
+                'first_name' => $this->child->first_name,
+                'last_name' => $this->child->last_name,
+                'full_name' => trim("{$this->child->first_name} {$this->child->last_name}"),
+            ]),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }

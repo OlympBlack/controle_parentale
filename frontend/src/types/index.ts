@@ -20,6 +20,27 @@ export type ScreenTimeRuleType = 'daily_quota' | 'schedule' | 'bedtime' | 'homew
 
 export type ScreenTimeRuleStatus = 'active' | 'inactive'
 
+export type ReportPeriodType = 'weekly' | 'monthly'
+
+export interface Report {
+  id: number
+  child_id: number
+  period_type: ReportPeriodType
+  period_start: string
+  period_end: string
+  digital_health_score: number | null
+  statistics: Record<string, unknown> | null
+  file_path: string | null
+  generated_at: string | null
+  child?: {
+    id: number
+    first_name: string
+    last_name: string | null
+    full_name: string
+  } | null
+  created_at: string
+}
+
 export interface ScreenTimeRule {
   id: number
   child_id: number

@@ -39,7 +39,7 @@ class ReportController extends Controller
     #[OA\Response(response: 401, ref: '#/components/responses/Unauthorized')]
     public function index(Request $request)
     {
-        $query = Report::query();
+        $query = Report::query()->with('child');
 
         if ($childId = $request->get('child_id')) {
             $query->where('child_id', $childId);
@@ -49,7 +49,7 @@ class ReportController extends Controller
             $query->where('period_type', $periodType);
         }
 
-        $reports = $query->latest('generated_at')->paginate(15);
+        $reports = $query->latest('generated_at')->paginate($request->get('per_page', 15));
 
         return $this->paginated($reports, 'Liste des rapports');
     }
