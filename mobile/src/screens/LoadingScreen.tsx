@@ -8,7 +8,7 @@ export function LoadingScreen() {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: colors.brand[600],
+      backgroundColor: colors.white,
     }}>
       <Image
         source={require('../../assets/safekid-logo.png')}
@@ -18,7 +18,7 @@ export function LoadingScreen() {
       <Text style={{
         fontSize: 24,
         fontWeight: '700',
-        color: colors.white,
+        color: colors.gray[900],
         marginTop: spacing.lg,
         letterSpacing: 0.5,
       }}>
@@ -26,14 +26,14 @@ export function LoadingScreen() {
       </Text>
       <Text style={{
         fontSize: 13,
-        color: colors.brand[100],
+        color: colors.gray[400],
         marginTop: 4,
       }}>
         Contrôle parental
       </Text>
       <ActivityIndicator
         size="large"
-        color={colors.white}
+        color={colors.brand[600]}
         style={{ marginTop: spacing['3xl'] }}
       />
     </View>
