@@ -5,7 +5,6 @@ import { LogOut, Menu, X, ChevronDown, Settings } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import safekidLogo from '@/assets/safekid.png'
 import { useAuth } from '@/contexts/AuthContext'
-import { useFamilyContext } from '@/contexts/FamilyContext'
 
 export interface NavItem {
   label: string
@@ -79,7 +78,6 @@ export function BaseDashboardLayout({
   roleBadgeClass,
 }: BaseDashboardLayoutProps) {
   const { user, logout } = useAuth()
-  const { activeFamily } = useFamilyContext()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -93,19 +91,9 @@ export function BaseDashboardLayout({
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Sidebar — desktop */}
       <aside className="hidden w-64 flex-shrink-0 border-r border-gray-200 bg-white lg:flex lg:flex-col">
-        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+        <div className="flex h-16 items-center border-b border-gray-200 px-4">
           <img src={safekidLogo} alt="Safekid" className="h-8 w-auto" />
-          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${roleBadgeClass}`}>
-            {roleLabel}
-          </span>
         </div>
-
-        {activeFamily && (
-          <div className="border-b border-gray-100 px-4 py-2.5">
-            <p className="truncate text-xs font-medium text-gray-500">Famille</p>
-            <p className="truncate text-sm font-semibold text-gray-900">{activeFamily.name}</p>
-          </div>
-        )}
 
         <SidebarNav items={navItems} settingsPath={settingsPath} />
       </aside>
@@ -134,13 +122,6 @@ export function BaseDashboardLayout({
                   <X className="h-5 w-5" />
                 </button>
               </div>
-
-              {activeFamily && (
-                <div className="border-b border-gray-100 px-4 py-2.5">
-                  <p className="truncate text-xs font-medium text-gray-500">Famille</p>
-                  <p className="truncate text-sm font-semibold text-gray-900">{activeFamily.name}</p>
-                </div>
-              )}
 
               <SidebarNav
                 items={navItems}
