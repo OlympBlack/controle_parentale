@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Model;
 
 class Family extends Model
@@ -16,7 +17,7 @@ class Family extends Model
         return $this->belongsToMany(User::class)
             ->withPivot('role', 'invited_by', 'joined_at')
             ->withTimestamps()
-            ->withCasts(['role' => \App\Enums\UserRole::class]);
+            ->withCasts(['role' => UserRole::class]);
     }
 
     public function children() {

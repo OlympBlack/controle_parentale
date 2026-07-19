@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +18,7 @@ class FamilyResource extends JsonResource
             'children_count' => $this->whenCounted('children'),
             'my_role'        => $this->whenPivotLoaded('family_user', function () {
                 $role = $this->pivot->role;
-                return $role instanceof \App\Enums\UserRole ? $role->value : $role;
+                return $role instanceof UserRole ? $role->value : $role;
             }),
             'created_at'     => $this->created_at?->toIso8601String(),
             'updated_at'     => $this->updated_at?->toIso8601String(),
