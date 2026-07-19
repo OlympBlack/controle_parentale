@@ -10,6 +10,7 @@ export interface NavItem {
   label: string
   icon: LucideIcon
   path: string
+  end?: boolean
 }
 
 interface BaseDashboardLayoutProps {
@@ -34,9 +35,10 @@ function SidebarNav({
     <>
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
         {items.map((item) => {
-          const active =
-            location.pathname === item.path ||
-            (item.path !== '/dashboard' && location.pathname.startsWith(item.path))
+          const active = item.end
+            ? location.pathname === item.path
+            : location.pathname === item.path ||
+              location.pathname.startsWith(item.path + '/')
           return (
             <Link
               key={item.path}

@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChildController;
 use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\FamilyController;
+use App\Http\Controllers\Api\FamilyMemberController;
+use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\Api\FilterRuleController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\NotificationController;
@@ -28,6 +30,9 @@ Route::middleware('throttle:10,1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
+// Invitations (public)
+Route::get('/invitations/{token}', [InvitationController::class, 'show']);
+
 /*
 |--------------------------------------------------------------------------
 | Protected routes (Sanctum authentication required)
@@ -46,6 +51,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Families
     Route::apiResource('families', FamilyController::class);
+    Route::get   ('families/{family}/members',                  [FamilyMemberController::class, 'index']);
+    Route::post  ('families/{family}/members',                  [FamilyMemberController::class, 'store']);
+    Route::patch ('families/{family}/members/{member}',         [FamilyMemberController::class, 'update']);
+    Route::delete('families/{family}/members/{member}',         [FamilyMemberController::class, 'destroy']);
+    Route::get   ('families/{family}/invitations',              [FamilyMemberController::class, 'pendingInvitations']);
+    Route::delete('families/{family}/invitations/{invitation}', [FamilyMemberController::class, 'cancelInvitation']);
+    Route::post  ('/invitations/{token}/accept',                [InvitationController::class,   'accept']);
 
     // Children
     Route::apiResource('children', ChildController::class);

@@ -42,6 +42,6 @@ class User extends Authenticatable
         return $this->belongsToMany(Family::class)
             ->withPivot('role', 'invited_by', 'joined_at')
             ->withTimestamps()
-            ->withCasts(['role' => UserRole::class]);
+            ->withCasts(['role' => UserRole::class, 'joined_at' => 'datetime']);
     }
 }

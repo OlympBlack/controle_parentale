@@ -7,8 +7,10 @@ import { LoginPage } from '@/pages/auth/LoginPage'
 import { RegisterPage } from '@/pages/auth/RegisterPage'
 import { DashboardRouter } from '@/pages/dashboard/DashboardRouter'
 import { OnboardingPage } from '@/pages/OnboardingPage'
+import { InvitationPage } from '@/pages/InvitationPage'
 import { AdminLayout } from '@/pages/dashboard/admin/AdminLayout'
 import { AdminDashboard } from '@/pages/dashboard/admin/AdminDashboard'
+import { AdminFamilyPage } from '@/pages/dashboard/admin/AdminFamilyPage'
 import { GestionnaireLayout } from '@/pages/dashboard/gestionnaire/GestionnaireLayout'
 import { GestionnaireDashboard } from '@/pages/dashboard/gestionnaire/GestionnaireDashboard'
 import { ObservateurLayout } from '@/pages/dashboard/observateur/ObservateurLayout'
@@ -72,6 +74,7 @@ export function AppRouter() {
               element={<RoleGuard allowedRoles={['admin']}><AdminLayout /></RoleGuard>}
             >
               <Route index element={<AdminDashboard />} />
+              <Route path="family" element={<AdminFamilyPage />} />
             </Route>
 
             {/* Gestionnaire */}
@@ -103,6 +106,7 @@ export function AppRouter() {
             }
           />
 
+          <Route path="/invitation/:token" element={<InvitationPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

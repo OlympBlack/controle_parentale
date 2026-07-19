@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { label: "Vue d'ensemble",  icon: LayoutDashboard, path: '/dashboard/admin' },
+  { label: "Vue d'ensemble",  icon: LayoutDashboard, path: '/dashboard/admin', end: true },
   { label: 'Enfants',         icon: Users,           path: '/dashboard/admin/children' },
   { label: 'Appareils',       icon: Smartphone,      path: '/dashboard/admin/devices' },
   { label: 'Filtrage',        icon: Shield,          path: '/dashboard/admin/filter-rules' },

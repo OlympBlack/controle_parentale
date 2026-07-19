@@ -17,7 +17,7 @@ class Family extends Model
         return $this->belongsToMany(User::class)
             ->withPivot('role', 'invited_by', 'joined_at')
             ->withTimestamps()
-            ->withCasts(['role' => UserRole::class]);
+            ->withCasts(['role' => UserRole::class, 'joined_at' => 'datetime']);
     }
 
     public function children() {

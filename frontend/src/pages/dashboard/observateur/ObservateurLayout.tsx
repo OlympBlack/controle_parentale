@@ -2,7 +2,7 @@ import { BaseDashboardLayout } from '@/components/layout/BaseDashboardLayout'
 import { LayoutDashboard, Eye, Bell, BarChart3 } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { label: "Vue d'ensemble", icon: LayoutDashboard, path: '/dashboard/observateur' },
+  { label: "Vue d'ensemble", icon: LayoutDashboard, path: '/dashboard/observateur', end: true },
   { label: 'Enfants',        icon: Eye,             path: '/dashboard/observateur/children' },
   { label: 'Alertes',        icon: Bell,            path: '/dashboard/observateur/alerts' },
   { label: 'Rapports',       icon: BarChart3,       path: '/dashboard/observateur/reports' },

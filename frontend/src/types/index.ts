@@ -4,6 +4,26 @@ export type UserRole = 'admin' | 'gestionnaire' | 'observateur'
 
 export type FamilyPlan = 'free' | 'premium'
 
+export interface PendingInvitation {
+  id: number
+  email: string
+  role: UserRole
+  role_label: string
+  invited_by: string
+  expires_at: string
+}
+
+export interface FamilyMember {
+  id: number
+  name: string
+  email: string
+  avatar: string | null
+  role: UserRole
+  role_label: string
+  joined_at: string | null
+  is_owner: boolean
+}
+
 export interface Family {
   id: number
   name: string
