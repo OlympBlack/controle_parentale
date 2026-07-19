@@ -1,84 +1,150 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { authService } from '@/services/auth.service'
-import type { User } from '@/types'
+import type { RegisterData, User } from '@/types'
 
 interface AuthContextValue {
   user: User | null
-  token: string | null
+  isAuthenticated: boolean
+  isInitializing: boolean
   loading: boolean
   login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string, passwordConfirmation: string, phone?: string) => Promise<void>
+  register: (data: RegisterData) => Promise<void>
   logout: () => Promise<void>
+  logoutAll: () => Promise<void>
+  changePassword: (current: string, next: string, confirmation: string) => Promise<void>
+  updateUser: (user: User) => void
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
+const TOKEN_KEY = 'auth_token'
+
+function persistAuth(token: string): void {
+  localStorage.setItem(TOKEN_KEY, token)
+}
+
+function clearPersistedAuth(): void {
+  localStorage.removeItem(TOKEN_KEY)
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem('auth_user')
-    return stored ? JSON.parse(stored) : null
-  })
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('auth_token'))
+  const [user, setUser] = useState<User | null>(null)
+  const [isInitializing, setIsInitializing] = useState(true)
   const [loading, setLoading] = useState(false)
 
-  const login = useCallback(async (email: string, password: string) => {
+  const clearAuth = useCallback((): void => {
+    clearPersistedAuth()
+    setUser(null)
+  }, [])
+
+  const clearAuthRef = useRef(clearAuth)
+  clearAuthRef.current = clearAuth
+
+  useEffect(() => {
+    const token = localStorage.getItem(TOKEN_KEY)
+
+    if (!token) {
+      setIsInitializing(false)
+      return
+    }
+
+    authService
+      .me()
+      .then((fetchedUser) => setUser(fetchedUser))
+      .catch(() => clearPersistedAuth())
+      .finally(() => setIsInitializing(false))
+  }, [])
+
+  useEffect(() => {
+    const handleExpired = (): void => clearAuthRef.current()
+    window.addEventListener('auth:expired', handleExpired)
+    return () => window.removeEventListener('auth:expired', handleExpired)
+  }, [])
+
+  const login = useCallback(async (email: string, password: string): Promise<void> => {
     setLoading(true)
     try {
-      const res = await authService.login(email, password, navigator.userAgent)
-      localStorage.setItem('auth_token', res.token)
-      localStorage.setItem('auth_user', JSON.stringify(res.user))
-      setToken(res.token)
+      const res = await authService.login(email, password)
+      persistAuth(res.token)
       setUser(res.user)
     } finally {
       setLoading(false)
     }
   }, [])
 
-  const register = useCallback(
-    async (name: string, email: string, password: string, passwordConfirmation: string, phone?: string) => {
-      setLoading(true)
-      try {
-        const res = await authService.register({
-          name,
-          email,
-          password,
-          password_confirmation: passwordConfirmation,
-          phone,
-          device_name: navigator.userAgent,
-        })
-        localStorage.setItem('auth_token', res.token)
-        localStorage.setItem('auth_user', JSON.stringify(res.user))
-        setToken(res.token)
-        setUser(res.user)
-      } finally {
-        setLoading(false)
-      }
+  const register = useCallback(async (data: RegisterData): Promise<void> => {
+    setLoading(true)
+    try {
+      const res = await authService.register(data)
+      persistAuth(res.token)
+      setUser(res.user)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const logout = useCallback(async (): Promise<void> => {
+    try {
+      await authService.logout()
+    } catch {
+      // Token may already be invalid — proceed with local cleanup regardless
+    } finally {
+      clearAuth()
+    }
+  }, [clearAuth])
+
+  const logoutAll = useCallback(async (): Promise<void> => {
+    try {
+      await authService.logoutAll()
+    } catch {
+      // Same as logout — clean up locally regardless
+    } finally {
+      clearAuth()
+    }
+  }, [clearAuth])
+
+  const changePassword = useCallback(
+    async (current: string, next: string, confirmation: string): Promise<void> => {
+      await authService.changePassword(current, next, confirmation)
     },
     []
   )
 
-  const logout = useCallback(async () => {
-    try {
-      await authService.logout()
-    } catch {
-      // ignore errors on logout
-    }
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('auth_user')
-    setToken(null)
-    setUser(null)
+  const updateUser = useCallback((updated: User): void => {
+    setUser(updated)
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: user !== null,
+        isInitializing,
+        loading,
+        login,
+        register,
+        logout,
+        logoutAll,
+        changePassword,
+        updateUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-export function useAuth() {
+export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
+  if (!ctx) throw new Error('useAuth must be used within <AuthProvider>')
   return ctx
 }

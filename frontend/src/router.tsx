@@ -8,15 +8,25 @@ import { CguPage } from '@/pages/legal/CguPage'
 import { PrivacyPage } from '@/pages/legal/PrivacyPage'
 import type { ReactNode } from 'react'
 
+function AppLoader() {
+  return (
+    <div className="flex h-screen items-center justify-center bg-white">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-600 border-t-transparent" />
+    </div>
+  )
+}
+
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { token } = useAuth()
-  if (!token) return <Navigate to="/login" replace />
+  const { isAuthenticated, isInitializing } = useAuth()
+  if (isInitializing) return <AppLoader />
+  if (!isAuthenticated) return <Navigate to="/login" replace />
   return <>{children}</>
 }
 
 function PublicOnlyRoute({ children }: { children: ReactNode }) {
-  const { token } = useAuth()
-  if (token) return <Navigate to="/dashboard" replace />
+  const { isAuthenticated, isInitializing } = useAuth()
+  if (isInitializing) return <AppLoader />
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />
   return <>{children}</>
 }
 

@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import type { AxiosError } from 'axios'
 import { useAuth } from '@/contexts/AuthContext'
 import { AuthLayout } from '@/components/layout/AuthLayout'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import type { ApiErrorResponse } from '@/types'
 import { AlertCircle } from 'lucide-react'
 
 export function RegisterPage() {
@@ -23,11 +25,16 @@ export function RegisterPage() {
     setGeneralError('')
 
     try {
-      await register(name, email, password, passwordConfirmation)
+      await register({ name, email, password, passwordConfirmation })
       navigate('/dashboard')
-    } catch (err: any) {
-      if (err.response?.status === 422) {
-        setErrors(err.response.data.errors || {})
+    } catch (err) {
+      const error = err as AxiosError<ApiErrorResponse>
+      const status = error.response?.status
+
+      if (status === 422) {
+        setErrors(error.response?.data?.errors ?? {})
+      } else if (status === 429) {
+        setGeneralError('Trop de tentatives. Veuillez patienter avant de réessayer.')
       } else {
         setGeneralError('Une erreur est survenue. Veuillez réessayer.')
       }

@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import type { AxiosError } from 'axios'
 import { useAuth } from '@/contexts/AuthContext'
 import { AuthLayout } from '@/components/layout/AuthLayout'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import type { ApiErrorResponse } from '@/types'
 import { AlertCircle } from 'lucide-react'
 
 export function LoginPage() {
@@ -23,11 +25,19 @@ export function LoginPage() {
     try {
       await login(email, password)
       navigate('/dashboard')
-    } catch (err: any) {
-      if (err.response?.status === 422) {
-        setErrors(err.response.data.errors || {})
-      } else if (err.response?.status === 401) {
-        setGeneralError(err.response.data.message || 'Identifiants incorrects')
+    } catch (err) {
+      const error = err as AxiosError<ApiErrorResponse>
+      const status = error.response?.status
+      const message = error.response?.data?.message
+
+      if (status === 422) {
+        setErrors(error.response?.data?.errors ?? {})
+      } else if (status === 401) {
+        setGeneralError(message ?? 'Identifiants incorrects.')
+      } else if (status === 403) {
+        setGeneralError(message ?? 'Votre compte est inactif. Contactez le support.')
+      } else if (status === 429) {
+        setGeneralError('Trop de tentatives. Veuillez patienter avant de réessayer.')
       } else {
         setGeneralError('Une erreur est survenue. Veuillez réessayer.')
       }
