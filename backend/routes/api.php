@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\FamilyController;
 use App\Http\Controllers\Api\FamilyMemberController;
 use App\Http\Controllers\Api\InvitationController;
+use App\Http\Controllers\Api\ContentCategoryController;
 use App\Http\Controllers\Api\FilterRuleController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\NotificationController;
@@ -82,6 +83,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Filter Rules
     Route::apiResource('filter-rules', FilterRuleController::class);
+
+    // Content Categories (index only)
+    Route::get('/content-categories', [ContentCategoryController::class, 'index']);
 
     // Screen Time Rules
     Route::apiResource('screen-time-rules', ScreenTimeRuleController::class);

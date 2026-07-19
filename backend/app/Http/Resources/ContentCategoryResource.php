@@ -14,6 +14,8 @@ class ContentCategoryResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
+            'is_sensitive' => $this->is_sensitive,
+            'children' => ContentCategoryResource::collection($this->whenLoaded('children')),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }

@@ -20,7 +20,7 @@ class ScreenTimeRuleController extends Controller
             $query->where('child_id', $childId);
         }
 
-        $rules = $query->paginate(15);
+        $rules = $query->paginate($request->get('per_page', 15));
 
         return $this->paginated($rules, 'Liste des règles de temps d\'écran');
     }
@@ -43,12 +43,12 @@ class ScreenTimeRuleController extends Controller
     public function update(Request $request, ScreenTimeRule $screenTimeRule)
     {
         $screenTimeRule->update($request->validate([
-            'type' => ['sometimes', 'string', 'in:daily,weekly,schedule'],
-            'duration_minutes' => ['sometimes', 'integer', 'min:1'],
+            'type' => ['sometimes', 'string', 'in:daily_quota,schedule,bedtime,homework,break'],
+            'duration_minutes' => ['sometimes', 'nullable', 'integer', 'min:1'],
             'day_of_week' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:6'],
             'start_time' => ['sometimes', 'nullable', 'date_format:H:i'],
             'end_time' => ['sometimes', 'nullable', 'date_format:H:i'],
-            'status' => ['sometimes', 'in:active,paused,disabled'],
+            'status' => ['sometimes', 'in:active,inactive'],
         ]));
 
         return $this->success(new ScreenTimeRuleResource($screenTimeRule), 'Règle mise à jour');

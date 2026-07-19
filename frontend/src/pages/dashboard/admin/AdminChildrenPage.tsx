@@ -79,7 +79,7 @@ function ChildModal({ child, familyId, onClose, onSaved }: ChildModalProps) {
   const isEdit = !!child
   const [firstName, setFirstName]     = useState(child?.first_name ?? '')
   const [lastName, setLastName]       = useState(child?.last_name ?? '')
-  const [birthDate, setBirthDate]     = useState(child?.birth_date ?? '')
+  const [birthDate, setBirthDate]     = useState(child?.birth_date ? child.birth_date.split('T')[0] : '')
   const [maturity, setMaturity]       = useState<MaturityLevel>(child?.maturity_level ?? 'enfant')
   const [statusVal, setStatusVal]     = useState<ChildStatus>(child?.status ?? 'active')
   const [pinCode, setPinCode]         = useState('')
@@ -217,20 +217,28 @@ function ChildModal({ child, familyId, onClose, onSaved }: ChildModalProps) {
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-gray-700">Statut</label>
               <div className="grid grid-cols-3 gap-2">
-                {STATUS_OPTIONS.map((s) => (
-                  <button
-                    key={s.value}
-                    type="button"
-                    onClick={() => setStatusVal(s.value)}
-                    className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                      statusVal === s.value
-                        ? 'border-brand-600 bg-brand-50 text-brand-700'
-                        : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+                {STATUS_OPTIONS.map((s) => {
+                  const selected = statusVal === s.value
+                  const activeStyles: Record<ChildStatus, string> = {
+                    active:   'border-emerald-500 bg-emerald-50 text-emerald-700',
+                    paused:   'border-gray-400 bg-gray-100 text-gray-700',
+                    archived: 'border-red-500 bg-red-50 text-red-700',
+                  }
+                  return (
+                    <button
+                      key={s.value}
+                      type="button"
+                      onClick={() => setStatusVal(s.value)}
+                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                        selected
+                          ? activeStyles[s.value]
+                          : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  )
+                })}
               </div>
               {errors.status && <p className="text-sm text-red-600">{errors.status}</p>}
             </div>

@@ -22,6 +22,12 @@ class DeviceResource extends JsonResource
             'battery_level' => $this->battery_level,
             'last_seen_at' => $this->last_seen_at?->toIso8601String(),
             'paired_at' => $this->paired_at?->toIso8601String(),
+            'child' => $this->whenLoaded('child', fn () => [
+                'id' => $this->child->id,
+                'first_name' => $this->child->first_name,
+                'last_name' => $this->child->last_name,
+                'full_name' => trim("{$this->child->first_name} {$this->child->last_name}"),
+            ]),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

@@ -12,6 +12,9 @@ import { AdminLayout } from '@/pages/dashboard/admin/AdminLayout'
 import { AdminDashboard } from '@/pages/dashboard/admin/AdminDashboard'
 import { AdminFamilyPage } from '@/pages/dashboard/admin/AdminFamilyPage'
 import { AdminChildrenPage } from '@/pages/dashboard/admin/AdminChildrenPage'
+import { AdminDevicesPage } from '@/pages/dashboard/admin/AdminDevicesPage'
+import { AdminFilterRulesPage } from '@/pages/dashboard/admin/AdminFilterRulesPage'
+import { AdminScreenTimePage } from '@/pages/dashboard/admin/AdminScreenTimePage'
 import { GestionnaireLayout } from '@/pages/dashboard/gestionnaire/GestionnaireLayout'
 import { GestionnaireDashboard } from '@/pages/dashboard/gestionnaire/GestionnaireDashboard'
 import { ObservateurLayout } from '@/pages/dashboard/observateur/ObservateurLayout'
@@ -76,6 +79,9 @@ export function AppRouter() {
             >
               <Route index element={<AdminDashboard />} />
               <Route path="children" element={<AdminChildrenPage />} />
+              <Route path="devices" element={<AdminDevicesPage />} />
+              <Route path="filter-rules" element={<AdminFilterRulesPage />} />
+              <Route path="screen-time" element={<AdminScreenTimePage />} />
               <Route path="family" element={<AdminFamilyPage />} />
             </Route>
 

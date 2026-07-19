@@ -20,7 +20,7 @@ class FilterRuleController extends Controller
             $query->where('child_id', $childId);
         }
 
-        $rules = $query->paginate(15);
+        $rules = $query->paginate($request->get('per_page', 15));
 
         return $this->paginated($rules, 'Liste des règles de filtrage');
     }

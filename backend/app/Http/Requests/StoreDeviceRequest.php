@@ -16,7 +16,7 @@ class StoreDeviceRequest extends FormRequest
         return [
             'child_id' => ['required', 'exists:children,id'],
             'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'max:50'],
+            'type' => ['required', 'string', 'in:mobile,tablette,pc,autre'],
             'os' => ['nullable', 'string', 'max:50'],
             'os_version' => ['nullable', 'string', 'max:50'],
         ];

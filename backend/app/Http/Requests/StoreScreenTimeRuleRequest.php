@@ -15,12 +15,12 @@ class StoreScreenTimeRuleRequest extends FormRequest
     {
         return [
             'child_id' => ['required', 'exists:children,id'],
-            'type' => ['required', 'string', 'in:daily,weekly,schedule'],
-            'duration_minutes' => ['required', 'integer', 'min:1'],
+            'type' => ['required', 'string', 'in:daily_quota,schedule,bedtime,homework,break'],
+            'duration_minutes' => ['nullable', 'integer', 'min:1'],
             'day_of_week' => ['nullable', 'integer', 'min:0', 'max:6'],
             'start_time' => ['nullable', 'date_format:H:i'],
             'end_time' => ['nullable', 'date_format:H:i'],
-            'status' => ['sometimes', 'in:active,paused,disabled'],
+            'status' => ['sometimes', 'in:active,inactive'],
         ];
     }
 }

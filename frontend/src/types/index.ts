@@ -8,6 +8,76 @@ export type MaturityLevel = 'enfant' | 'preado' | 'ado'
 
 export type ChildStatus = 'active' | 'paused' | 'archived'
 
+export type DeviceType = 'mobile' | 'tablette' | 'pc' | 'autre'
+
+export type DeviceStatus = 'pending' | 'active' | 'inactive' | 'blocked'
+
+export type FilterRuleType = 'domain' | 'keyword' | 'category' | 'app'
+
+export type FilterRuleStatus = 'active' | 'paused' | 'disabled'
+
+export type ScreenTimeRuleType = 'daily_quota' | 'schedule' | 'bedtime' | 'homework' | 'break'
+
+export type ScreenTimeRuleStatus = 'active' | 'inactive'
+
+export interface ScreenTimeRule {
+  id: number
+  child_id: number
+  type: ScreenTimeRuleType
+  duration_minutes: number | null
+  day_of_week: number | null
+  start_time: string | null
+  end_time: string | null
+  status: ScreenTimeRuleStatus
+  created_at: string
+  updated_at: string
+}
+
+export interface ContentCategory {
+  id: number
+  name: string
+  slug: string
+  description: string | null
+  is_sensitive: boolean
+  children?: ContentCategory[]
+  created_at: string
+}
+
+export interface FilterRule {
+  id: number
+  child_id: number
+  type: FilterRuleType
+  value: string
+  status: FilterRuleStatus
+  version: number | null
+  categories?: ContentCategory[]
+  created_at: string
+  updated_at: string
+}
+
+export interface Device {
+  id: number
+  child_id: number | null
+  name: string
+  type: DeviceType
+  os: string | null
+  os_version: string | null
+  app_version: string | null
+  status: DeviceStatus
+  is_online: boolean
+  battery_level: number | null
+  last_seen_at: string | null
+  paired_at: string | null
+  child?: {
+    id: number
+    first_name: string
+    last_name: string | null
+    full_name: string
+  } | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Child {
   id: number
   family_id: number
