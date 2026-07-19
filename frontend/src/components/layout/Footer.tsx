@@ -1,5 +1,5 @@
-import { ShieldCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import safekidLogo from '@/assets/safekid.png'
 
 export function Footer() {
   return (
@@ -7,11 +7,8 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600">
-                <ShieldCheck className="h-4 w-4 text-white" />
-              </div>
-              <span className="font-bold text-gray-900">Contrôle Parental</span>
+            <div className="flex items-center">
+              <img src={safekidLogo} alt="Safekid" className="h-8 w-auto" />
             </div>
             <p className="text-sm text-gray-500">
               Protégez vos enfants dans le monde numérique avec une supervision intelligente et bienveillante.

@@ -1,7 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { ShieldCheck, ChevronDown, LogOut, LayoutDashboard } from 'lucide-react'
+import { ChevronDown, LogOut, LayoutDashboard } from 'lucide-react'
+import safekidLogo from '@/assets/safekid.png'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -24,11 +25,8 @@ export function Navbar() {
       className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md"
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600">
-            <ShieldCheck className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-lg font-bold text-gray-900">Contrôle Parental</span>
+        <Link to="/" className="flex items-center">
+          <img src={safekidLogo} alt="Safekid" className="h-9 w-auto" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import safekidLogo from '@/assets/safekid.png'
 import {
-  ShieldCheck,
   LayoutDashboard,
   Eye,
   Clock,
@@ -44,11 +44,8 @@ export function DashboardLayout({ children, title }: { children: ReactNode; titl
     <div className="flex h-screen overflow-hidden bg-brand-50">
       {/* Sidebar — desktop */}
       <aside className="hidden w-64 flex-shrink-0 border-r border-gray-200 bg-white lg:flex lg:flex-col">
-        <div className="flex h-16 items-center gap-2 border-b border-gray-200 px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600">
-            <ShieldCheck className="h-4 w-4 text-white" />
-          </div>
-          <span className="font-bold text-gray-900">Contrôle Parental</span>
+        <div className="flex h-16 items-center border-b border-gray-200 px-6">
+          <img src={safekidLogo} alt="Safekid" className="h-8 w-auto" />
         </div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
@@ -101,11 +98,8 @@ export function DashboardLayout({ children, title }: { children: ReactNode; titl
               className="fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-gray-200 bg-white lg:hidden"
             >
               <div className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600">
-                    <ShieldCheck className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="font-bold text-gray-900">Contrôle Parental</span>
+                <div className="flex items-center">
+                  <img src={safekidLogo} alt="Safekid" className="h-8 w-auto" />
                 </div>
                 <button onClick={() => setSidebarOpen(false)} className="text-gray-500 hover:text-gray-700">
                   <X className="h-5 w-5" />

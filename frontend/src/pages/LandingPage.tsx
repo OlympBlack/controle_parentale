@@ -324,10 +324,10 @@ export function LandingPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-8 text-center lg:grid-cols-4">
             {[
-              { value: '50K+', label: 'Familles protégées' },
-              { value: '120K+', label: 'Appareils supervisés' },
-              { value: '99.9%', label: 'Disponibilité' },
-              { value: '4.9/5', label: 'Note moyenne' },
+              { value: '2 min', label: 'Pour configurer le premier profil' },
+              { value: '100%', label: 'Sans accès aux données personnelles' },
+              { value: '24/7', label: 'Supervision continue, même hors ligne' },
+              { value: '0€', label: 'Pour démarrer, sans carte bancaire' },
             ].map((stat) => (
               <div key={stat.label}>
                 <div className="text-3xl font-extrabold text-gray-900">{stat.value}</div>
@@ -630,7 +630,7 @@ export function LandingPage() {
             Prêt à protéger vos enfants ?
           </h2>
           <p className="mt-4 text-lg text-white/80">
-            Rejoignez plus de 50 000 familles. Configuration en 2 minutes.
+            Démarrez gratuitement en 2 minutes. Sans carte bancaire.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link to="/register">

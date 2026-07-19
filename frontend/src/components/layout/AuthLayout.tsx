@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ShieldCheck, Check } from 'lucide-react'
+import { Check } from 'lucide-react'
+import safekidLogo from '@/assets/safekid.png'
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,11 +9,8 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
       {/* Left side - Form */}
       <div className="flex w-full flex-col overflow-y-auto px-4 py-8 sm:px-6 lg:w-1/2 lg:px-8">
         <div className="mx-auto my-auto w-full max-w-md">
-          <Link to="/" className="mb-8 flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600">
-              <ShieldCheck className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-lg font-bold text-gray-900">Contrôle Parental</span>
+          <Link to="/" className="mb-8 flex items-center">
+            <img src={safekidLogo} alt="Safekid" className="h-9 w-auto" />
           </Link>
           {children}
         </div>

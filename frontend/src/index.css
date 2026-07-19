@@ -17,10 +17,15 @@
   --color-accent-500: #aa3bff;
   --color-accent-600: #8b2de0;
 
-  --font-sans: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 4rem;
+  }
+
   * {
     border-color: var(--color-gray-200);
   }
