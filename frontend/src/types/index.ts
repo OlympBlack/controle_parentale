@@ -1,5 +1,20 @@
 export type UserStatus = 'active' | 'suspended' | 'pending'
 
+export type UserRole = 'admin' | 'gestionnaire' | 'observateur'
+
+export type FamilyPlan = 'free' | 'premium'
+
+export interface Family {
+  id: number
+  name: string
+  plan: FamilyPlan
+  owner?: User
+  children_count?: number
+  my_role?: UserRole
+  created_at: string
+  updated_at: string
+}
+
 export interface User {
   id: number
   name: string

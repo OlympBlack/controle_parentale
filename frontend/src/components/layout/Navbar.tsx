@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/contexts/AuthContext'
 
 export function Navbar() {
-  const { user, token, logout } = useAuth()
+  const { user, isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
   const [profileOpen, setProfileOpen] = useState(false)
 
@@ -41,7 +41,7 @@ export function Navbar() {
           </a>
         </nav>
 
-        {token && user ? (
+        {isAuthenticated && user ? (
           <div className="relative">
             <button
               onClick={() => setProfileOpen((s) => !s)}
