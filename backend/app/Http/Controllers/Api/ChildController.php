@@ -48,7 +48,7 @@ class ChildController extends Controller
             $query->where('family_id', $familyId);
         }
 
-        $children = $query->paginate(15);
+        $children = $query->paginate($request->get('per_page', 15));
 
         return $this->paginated($children, 'Liste des enfants');
     }

@@ -4,6 +4,26 @@ export type UserRole = 'admin' | 'gestionnaire' | 'observateur'
 
 export type FamilyPlan = 'free' | 'premium'
 
+export type MaturityLevel = 'enfant' | 'preado' | 'ado'
+
+export type ChildStatus = 'active' | 'paused' | 'archived'
+
+export interface Child {
+  id: number
+  family_id: number
+  first_name: string
+  last_name: string | null
+  full_name: string
+  birth_date: string
+  avatar: string | null
+  maturity_level: MaturityLevel
+  status: ChildStatus
+  digital_health_score: number | null
+  devices_count?: number
+  created_at: string
+  updated_at: string
+}
+
 export interface PendingInvitation {
   id: number
   email: string

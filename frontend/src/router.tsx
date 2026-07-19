@@ -11,6 +11,7 @@ import { InvitationPage } from '@/pages/InvitationPage'
 import { AdminLayout } from '@/pages/dashboard/admin/AdminLayout'
 import { AdminDashboard } from '@/pages/dashboard/admin/AdminDashboard'
 import { AdminFamilyPage } from '@/pages/dashboard/admin/AdminFamilyPage'
+import { AdminChildrenPage } from '@/pages/dashboard/admin/AdminChildrenPage'
 import { GestionnaireLayout } from '@/pages/dashboard/gestionnaire/GestionnaireLayout'
 import { GestionnaireDashboard } from '@/pages/dashboard/gestionnaire/GestionnaireDashboard'
 import { ObservateurLayout } from '@/pages/dashboard/observateur/ObservateurLayout'
@@ -74,6 +75,7 @@ export function AppRouter() {
               element={<RoleGuard allowedRoles={['admin']}><AdminLayout /></RoleGuard>}
             >
               <Route index element={<AdminDashboard />} />
+              <Route path="children" element={<AdminChildrenPage />} />
               <Route path="family" element={<AdminFamilyPage />} />
             </Route>
 
