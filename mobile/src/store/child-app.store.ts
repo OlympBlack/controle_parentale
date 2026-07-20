@@ -5,6 +5,7 @@ import * as Battery from 'expo-battery'
 import { Platform } from 'react-native'
 import { SECURE_STORE_KEYS } from '@/constants/config'
 import { deviceService } from '@/services/device.service'
+import { syncInstalledApps } from '@/services/collect.service'
 import type { Child, Device } from '@/types'
 
 interface ChildAppState {
@@ -111,6 +112,10 @@ export const useChildAppStore = create<ChildAppState>((set, get) => ({
           notifications: perms.notifications ?? false,
         },
       })
+
+      // Sync installed apps in the background after pairing
+      void syncInstalledApps()
+
       return true
     } catch (e) {
       console.error('[ChildApp] pairDevice error:', e)

@@ -110,4 +110,23 @@ export const deviceService = {
   ): Promise<void> {
     await apiClient.post(`/devices/${deviceId}/location`, location)
   },
+
+  async sendInstalledApps(
+    deviceId: number,
+    apps: Array<{
+      package_name: string
+      name: string
+      version?: string
+      is_system_app: boolean
+    }>
+  ): Promise<void> {
+    console.log('[SafeKid] sendInstalledApps → device:', deviceId, 'apps:', apps.length)
+    try {
+      const res = await apiClient.post(`/devices/${deviceId}/installed-apps`, { apps })
+      console.log('[SafeKid] sendInstalledApps ✓ status:', res.status)
+    } catch (e: any) {
+      console.error('[SafeKid] sendInstalledApps ✗', e?.response?.status, e?.response?.data ?? e?.message)
+      throw e
+    }
+  },
 }

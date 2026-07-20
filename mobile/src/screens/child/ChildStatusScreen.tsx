@@ -5,7 +5,7 @@ import { colors } from '@/theme/colors'
 import { spacing } from '@/theme'
 import { useChildAppStore } from '@/store/child-app.store'
 import { useAuthStore } from '@/store/auth.store'
-import { syncUsageNow } from '@/services/collect.service'
+import { syncUsageNow, syncInstalledApps } from '@/services/collect.service'
 
 export function ChildStatusScreen() {
   const { device, permissions, syncing, syncResult, lastSync, setSyncing, setSyncResult, setLastSync, unpair } = useChildAppStore()
@@ -13,12 +13,17 @@ export function ChildStatusScreen() {
   const [refreshing, setRefreshing] = useState(false)
 
   const handleSync = useCallback(async () => {
+    if (!device) return
     setSyncing(true)
-    const result = await syncUsageNow()
-    setSyncResult(result)
+    const usageResult = await syncUsageNow()
+    const appsResult = await syncInstalledApps()
+    setSyncResult({
+      success: usageResult.success && appsResult.success,
+      count: usageResult.count + appsResult.count,
+    })
     setLastSync(new Date().toLocaleTimeString('fr-FR'))
     setSyncing(false)
-  }, [setSyncing, setSyncResult, setLastSync])
+  }, [device, setSyncing, setSyncResult, setLastSync])
 
   const onRefresh = async () => {
     setRefreshing(true)

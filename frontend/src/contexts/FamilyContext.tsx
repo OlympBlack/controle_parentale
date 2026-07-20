@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -59,14 +60,15 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
     }
   }, [resolveActiveFamily])
 
-  const loadFamiliesRef = useRef(false)
+  const hasLoadedRef = useRef(false)
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (loadFamiliesRef.current) return
-      loadFamiliesRef.current = true
-      void loadFamilies().finally(() => { loadFamiliesRef.current = false })
+      if (hasLoadedRef.current) return
+      hasLoadedRef.current = true
+      void loadFamilies()
     } else {
+      hasLoadedRef.current = false
       setFamilies([])
       setActiveFamilyState(null)
       setIsLoadingFamily(false)
@@ -80,17 +82,20 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
 
   const currentRole: UserRole | null = activeFamily?.my_role ?? null
 
+  const value = useMemo<FamilyContextValue>(
+    () => ({
+      families,
+      activeFamily,
+      currentRole,
+      isLoadingFamily,
+      setActiveFamily,
+      refreshFamilies: loadFamilies,
+    }),
+    [families, activeFamily, currentRole, isLoadingFamily, setActiveFamily, loadFamilies]
+  )
+
   return (
-    <FamilyContext.Provider
-      value={{
-        families,
-        activeFamily,
-        currentRole,
-        isLoadingFamily,
-        setActiveFamily,
-        refreshFamilies: loadFamilies,
-      }}
-    >
+    <FamilyContext.Provider value={value}>
       {children}
     </FamilyContext.Provider>
   )

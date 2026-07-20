@@ -168,3 +168,49 @@ export async function syncUsageNow(): Promise<{ success: boolean; count: number 
     return { success: false, count: 0 }
   }
 }
+
+export async function syncInstalledApps(): Promise<{ success: boolean; count: number }> {
+  try {
+    const deviceId = await SecureStore.getItemAsync(SECURE_STORE_KEYS.DEVICE_ID)
+    if (!deviceId) {
+      console.warn('[SafeKid] syncInstalledApps: no device ID')
+      return { success: false, count: 0 }
+    }
+
+    let apps: { package_name: string; name: string; version: string; is_system_app: boolean }[] = []
+
+    if (Platform.OS === 'android' && UsageAccess.isAvailable()) {
+      const installed = await UsageAccess.getInstalledApps()
+      apps = installed.map((app) => ({
+        package_name: app.packageName,
+        name: app.name,
+        version: app.version,
+        is_system_app: app.isSystemApp,
+      }))
+    } else {
+      // ─── Demo mode (Expo Go / no native module) ───────────────────────────
+      console.log('[SafeKid] syncInstalledApps: using demo data (native module unavailable)')
+      apps = [
+        { package_name: 'com.whatsapp',         name: 'WhatsApp',  version: '1.0.0', is_system_app: false },
+        { package_name: 'com.youtube.app',      name: 'YouTube',   version: '2.0.0', is_system_app: false },
+        { package_name: 'com.android.chrome',   name: 'Chrome',    version: '3.0.0', is_system_app: false },
+        { package_name: 'com.instagram.android', name: 'Instagram', version: '4.0.0', is_system_app: false },
+        { package_name: 'com.spotify.music',    name: 'Spotify',   version: '5.0.0', is_system_app: false },
+      ]
+    }
+
+    if (apps.length === 0) return { success: true, count: 0 }
+
+    await deviceService.sendInstalledApps(Number(deviceId), apps)
+    console.log('[SafeKid] syncInstalledApps: success,', apps.length, 'apps sent')
+    return { success: true, count: apps.length }
+  } catch (e: any) {
+    console.error('[SafeKid] syncInstalledApps error:', e?.response?.status, e?.response?.data ?? e?.message)
+    if (e?.response?.status === 404) {
+      console.warn('[SafeKid] syncInstalledApps: device not found (404), clearing stored IDs')
+      await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.DEVICE_ID)
+      await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.CHILD_ID)
+    }
+    return { success: false, count: 0 }
+  }
+}

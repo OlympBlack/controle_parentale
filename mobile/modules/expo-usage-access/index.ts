@@ -5,10 +5,18 @@ export interface UsageStat {
   lastTimeUsed: number
 }
 
+export interface InstalledApp {
+  packageName: string
+  name: string
+  version: string
+  isSystemApp: boolean
+}
+
 export interface ExpoUsageAccessModuleType {
   checkUsageAccessPermission(): Promise<boolean>
   openUsageAccessSettings(): Promise<void>
   getUsageStats(startTime: number, endTime: number): Promise<UsageStat[]>
+  getInstalledApps(): Promise<InstalledApp[]>
 }
 
 let nativeModule: ExpoUsageAccessModuleType | null = null
@@ -48,6 +56,12 @@ export const UsageAccess = {
     const mod = getNativeModule()
     if (!mod) return []
     return mod.getUsageStats(startTime, endTime)
+  },
+
+  async getInstalledApps(): Promise<InstalledApp[]> {
+    const mod = getNativeModule()
+    if (!mod) return []
+    return mod.getInstalledApps()
   },
 }
 

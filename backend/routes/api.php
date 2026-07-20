@@ -67,9 +67,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Devices
     Route::apiResource('devices', DeviceController::class);
     Route::post  ('/devices/pair',                 [DeviceController::class, 'pair']);
-    Route::post  ('/devices/{device}/usage',       [UsageController::class, 'storeUsage']);
-    Route::post  ('/devices/{device}/location',    [UsageController::class, 'storeLocation']);
-    Route::patch ('/devices/{device}/permissions', [UsageController::class, 'updatePermissions']);
+    Route::post  ('/devices/{device}/usage',         [UsageController::class, 'storeUsage']);
+    Route::post  ('/devices/{device}/location',      [UsageController::class, 'storeLocation']);
+    Route::post  ('/devices/{device}/installed-apps', [UsageController::class, 'storeInstalledApps']);
+    Route::patch ('/devices/{device}/permissions',   [UsageController::class, 'updatePermissions']);
 
     // Children — usage & location
     Route::get('/children/{child}/usage',           [UsageController::class, 'childUsage']);

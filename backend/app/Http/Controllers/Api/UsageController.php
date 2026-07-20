@@ -67,6 +67,47 @@ class UsageController extends Controller
         return $this->success(new LocationResource($location), 'Position enregistrée', 201);
     }
 
+    // ─── Device installed apps (from child app) ───────────────────────────────
+
+    public function storeInstalledApps(Request $request, Device $device)
+    {
+        $validated = $request->validate([
+            'apps' => ['required', 'array'],
+            'apps.*.package_name' => ['required', 'string'],
+            'apps.*.name' => ['required', 'string'],
+            'apps.*.version' => ['nullable', 'string'],
+            'apps.*.is_system_app' => ['boolean'],
+        ]);
+
+        $now = now();
+        $syncData = [];
+
+        foreach ($validated['apps'] as $app) {
+            $application = Application::updateOrCreate(
+                ['package_name' => $app['package_name']],
+                [
+                    'name' => $app['name'],
+                    'platform' => 'android',
+                    'is_system_app' => $app['is_system_app'] ?? false,
+                ]
+            );
+
+            $syncData[$application->id] = [
+                'installed_at' => $now,
+                'version' => $app['version'] ?? null,
+            ];
+        }
+
+        $device->installedApps()->syncWithoutDetaching($syncData);
+        $device->update(['derniere_synchronisation' => $now]);
+
+        return $this->success(
+            ['count' => count($syncData)],
+            'Applications installées synchronisées',
+            201
+        );
+    }
+
     // ─── Device permissions update ────────────────────────────────────────────
 
     public function updatePermissions(Request $request, Device $device)

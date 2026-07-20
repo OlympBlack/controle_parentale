@@ -8,6 +8,8 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.app.usage.UsageStats
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.records.Field
@@ -51,6 +53,24 @@ class ExpoUsageAccessModule : Module() {
                 )
             }
         }
+
+        AsyncFunction("getInstalledApps") {
+            val pm = context.packageManager
+            val packages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm.getInstalledApplications(PackageManager.ApplicationInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getInstalledApplications(0)
+            }
+            packages.map { appInfo ->
+                mapOf(
+                    "packageName" to appInfo.packageName,
+                    "name" to pm.getApplicationLabel(appInfo).toString(),
+                    "version" to getAppVersion(appInfo.packageName),
+                    "isSystemApp" to ((appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)
+                )
+            }
+        }
     }
 
     private fun checkUsageAccess(): Boolean {
@@ -79,6 +99,21 @@ class ExpoUsageAccessModule : Module() {
             pm.getApplicationLabel(info).toString()
         } catch (e: Exception) {
             packageName
+        }
+    }
+
+    private fun getAppVersion(packageName: String): String {
+        return try {
+            val pm = context.packageManager
+            val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getPackageInfo(packageName, 0)
+            }
+            info.versionName ?: ""
+        } catch (e: Exception) {
+            ""
         }
     }
 }
