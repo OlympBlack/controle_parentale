@@ -1,7 +1,20 @@
 export const typography = {
   fontFamily: {
-    sans: 'Space Grotesk',
+    regular: 'SpaceGrotesk_400Regular',
+    medium: 'SpaceGrotesk_500Medium',
+    semibold: 'SpaceGrotesk_600SemiBold',
+    bold: 'SpaceGrotesk_700Bold',
+    sans: 'SpaceGrotesk_400Regular',
     mono: 'monospace',
+  },
+  fontForWeight: (weight: '400' | '500' | '600' | '700'): string => {
+    const map: Record<string, string> = {
+      '400': 'SpaceGrotesk_400Regular',
+      '500': 'SpaceGrotesk_500Medium',
+      '600': 'SpaceGrotesk_600SemiBold',
+      '700': 'SpaceGrotesk_700Bold',
+    }
+    return map[weight] ?? 'SpaceGrotesk_400Regular'
   },
   fontSize: {
     xs: 12,

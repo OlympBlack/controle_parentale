@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native'
+import { View, Text, ScrollView, ActivityIndicator, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Smartphone, Shield, Clock, BarChart3, AlertCircle } from 'lucide-react-native'
-import { useRoute, type RouteProp } from '@react-navigation/native'
+import { Smartphone, Shield, Clock, BarChart3, AlertCircle, MapPin, ChevronRight } from 'lucide-react-native'
+import { useRoute, useNavigation, type RouteProp } from '@react-navigation/native'
 import type { AppStackParamList } from '@/navigation/AppNavigator'
 import { childService } from '@/services/child.service'
 import { Card } from '@/components/Card'
@@ -13,7 +13,8 @@ import type { Child } from '@/types'
 
 export function ChildDetailScreen() {
   const route = useRoute<RouteProp<AppStackParamList, 'ChildDetail'>>()
-  const { childId } = route.params
+  const navigation = useNavigation<any>()
+  const { childId, childName } = route.params
 
   const [child, setChild] = useState<Child | null>(null)
   const [loading, setLoading] = useState(true)
@@ -142,6 +143,58 @@ export function ChildDetailScreen() {
             </Text>
           </Card>
         )}
+
+        {/* Navigation to device usage & location */}
+        <Pressable
+          onPress={() => navigation.navigate('Devices', { childId, childName })}
+          style={({ pressed }) => ({
+            flexDirection: 'row', alignItems: 'center',
+            backgroundColor: colors.white,
+            borderRadius: 12, padding: spacing.lg,
+            marginBottom: spacing.sm, borderWidth: 1, borderColor: colors.gray[200],
+            opacity: pressed ? 0.8 : 1,
+          })}
+        >
+          <Smartphone size={20} color={colors.brand[600]} style={{ marginRight: spacing.md }} />
+          <Text style={{ flex: 1, fontSize: 15, fontFamily: 'SpaceGrotesk_500Medium', color: colors.gray[900] }}>
+            Appareils
+          </Text>
+          <ChevronRight size={20} color={colors.gray[300]} />
+        </Pressable>
+
+        <Pressable
+          onPress={() => navigation.navigate('ScreenTime', { childId, childName })}
+          style={({ pressed }) => ({
+            flexDirection: 'row', alignItems: 'center',
+            backgroundColor: colors.white,
+            borderRadius: 12, padding: spacing.lg,
+            marginBottom: spacing.sm, borderWidth: 1, borderColor: colors.gray[200],
+            opacity: pressed ? 0.8 : 1,
+          })}
+        >
+          <Clock size={20} color={colors.amber[600]} style={{ marginRight: spacing.md }} />
+          <Text style={{ flex: 1, fontSize: 15, fontFamily: 'SpaceGrotesk_500Medium', color: colors.gray[900] }}>
+            Temps d'écran
+          </Text>
+          <ChevronRight size={20} color={colors.gray[300]} />
+        </Pressable>
+
+        <Pressable
+          onPress={() => navigation.navigate('Location', { childId, childName })}
+          style={({ pressed }) => ({
+            flexDirection: 'row', alignItems: 'center',
+            backgroundColor: colors.white,
+            borderRadius: 12, padding: spacing.lg,
+            marginBottom: spacing.sm, borderWidth: 1, borderColor: colors.gray[200],
+            opacity: pressed ? 0.8 : 1,
+          })}
+        >
+          <MapPin size={20} color={colors.blue[600]} style={{ marginRight: spacing.md }} />
+          <Text style={{ flex: 1, fontSize: 15, fontFamily: 'SpaceGrotesk_500Medium', color: colors.gray[900] }}>
+            Localisation
+          </Text>
+          <ChevronRight size={20} color={colors.gray[300]} />
+        </Pressable>
       </SafeAreaView>
     </ScrollView>
   )

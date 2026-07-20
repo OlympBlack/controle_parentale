@@ -35,7 +35,7 @@ export function Input({
 
   return (
     <View style={{ marginBottom: 16 }}>
-      {label && <Text style={inputStyles.label}>{label}</Text>}
+      {label && <Text style={[inputStyles.label, { fontFamily: 'SpaceGrotesk_500Medium' }]}>{label}</Text>}
       <View style={{ position: 'relative' }}>
         <TextInput
           value={value}
@@ -68,7 +68,7 @@ export function Input({
           </Pressable>
         )}
       </View>
-      {error && <Text style={inputStyles.errorText}>{error}</Text>}
+      {error && <Text style={[inputStyles.errorText, { fontFamily: 'SpaceGrotesk_400Regular' }]}>{error}</Text>}
     </View>
   )
 }

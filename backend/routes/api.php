@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ScreenTimeRuleController;
+use App\Http\Controllers\Api\UsageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -65,6 +66,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Devices
     Route::apiResource('devices', DeviceController::class);
+    Route::post  ('/devices/{device}/usage',       [UsageController::class, 'storeUsage']);
+    Route::post  ('/devices/{device}/location',    [UsageController::class, 'storeLocation']);
+    Route::patch ('/devices/{device}/permissions', [UsageController::class, 'updatePermissions']);
+
+    // Children — usage & location
+    Route::get('/children/{child}/usage',           [UsageController::class, 'childUsage']);
+    Route::get('/children/{child}/usage/today',     [UsageController::class, 'childUsageToday']);
+    Route::get('/children/{child}/location/last',   [UsageController::class, 'childLocationLast']);
+    Route::get('/children/{child}/location/history',[UsageController::class, 'childLocationHistory']);
 
     // Activities (index + show only)
     Route::apiResource('activities', ActivityController::class)->only(['index', 'show']);
@@ -93,7 +103,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // App Rules
     Route::apiResource('app-rules', AppRuleController::class);
 
-    // Locations
+    // Locations (legacy index endpoint)
     Route::get('/locations', [LocationController::class, 'index']);
-    Route::get('/children/{childId}/locations/latest', [LocationController::class, 'latest']);
 });

@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { label: 'Appareils',       icon: Smartphone,      path: '/dashboard/admin/devices' },
   { label: 'Filtrage',        icon: Shield,          path: '/dashboard/admin/filter-rules' },
   { label: "Temps d'écran",   icon: Clock,           path: '/dashboard/admin/screen-time' },
+  { label: "Usage apps",      icon: BarChart3,       path: '/dashboard/admin/usage' },
   { label: 'Géolocalisation', icon: MapPin,          path: '/dashboard/admin/locations' },
   { label: 'Alertes',         icon: Bell,            path: '/dashboard/admin/alerts' },
   { label: 'Rapports',        icon: BarChart3,       path: '/dashboard/admin/reports' },

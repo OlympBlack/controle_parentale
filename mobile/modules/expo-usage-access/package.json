@@ -1,0 +1,9 @@
+{
+  "name": "expo-usage-access",
+  "version": "1.0.0",
+  "description": "Android Usage Access (UsageStatsManager) module for SafeKid",
+  "main": "index.ts",
+  "platforms": {
+    "android": {}
+  }
+}

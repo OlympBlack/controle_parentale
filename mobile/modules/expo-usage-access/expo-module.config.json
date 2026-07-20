@@ -1,0 +1,6 @@
+{
+  "expo": {
+    "name": "expo-usage-access",
+    "platforms": ["android"]
+  }
+}

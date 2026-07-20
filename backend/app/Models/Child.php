@@ -38,4 +38,8 @@ class Child extends Model
     public function activities() {
         return $this->hasMany(Activity::class);
     }
+
+    public function locations() {
+        return $this->hasMany(Location::class);
+    }
 }

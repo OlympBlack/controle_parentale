@@ -7,6 +7,9 @@ export const API_BASE_URL =
 
 export const SECURE_STORE_KEYS = {
   AUTH_TOKEN: 'safekid_auth_token',
+  DEVICE_ID: 'safekid_device_id',
+  CHILD_ID: 'safekid_child_id',
+  APP_MODE: 'safekid_app_mode',
 } as const
 
 export const STORAGE_KEYS = {

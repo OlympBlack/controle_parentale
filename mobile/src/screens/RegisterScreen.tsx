@@ -44,10 +44,10 @@ export function RegisterScreen() {
 
         {/* Hero text */}
         <View style={{ marginBottom: spacing.xl }}>
-          <Text style={{ fontSize: 22, fontWeight: '700', fontFamily: 'Space Grotesk', color: colors.gray[900] }}>
+          <Text style={{ fontSize: 22, fontWeight: '700', fontFamily: 'SpaceGrotesk_700Bold', color: colors.gray[900] }}>
             Créer un compte
           </Text>
-          <Text style={{ fontSize: 14, fontFamily: 'Space Grotesk', color: colors.gray[600], marginTop: spacing.xs }}>
+          <Text style={{ fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular', color: colors.gray[600], marginTop: spacing.xs }}>
             Commencez votre essai gratuit. Aucune carte requise.
           </Text>
         </View>
@@ -57,7 +57,7 @@ export function RegisterScreen() {
           {error && (
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12, backgroundColor: colors.red[50], borderRadius: 8, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.red[100] }}>
               <AlertCircle size={20} color={colors.red[600]} />
-              <Text style={{ color: colors.red[700], fontSize: 13, fontFamily: 'Space Grotesk', flex: 1 }}>{error}</Text>
+              <Text style={{ color: colors.red[700], fontSize: 13, fontFamily: 'SpaceGrotesk_400Regular', flex: 1 }}>{error}</Text>
             </View>
           )}
 
@@ -110,11 +110,11 @@ export function RegisterScreen() {
             }}>
               {acceptedTerms && <Check size={12} color={colors.white} strokeWidth={3} />}
             </View>
-            <Text style={{ fontSize: 13, fontFamily: 'Space Grotesk', color: colors.gray[600], flex: 1 }}>
+            <Text style={{ fontSize: 13, fontFamily: 'SpaceGrotesk_400Regular', color: colors.gray[600], flex: 1 }}>
               J'accepte les{' '}
-              <Text style={{ color: colors.brand[600], fontWeight: '500', fontFamily: 'Space Grotesk' }} onPress={() => Linking.openURL('https://safekid.app/cgu')}>CGU</Text>
+              <Text style={{ color: colors.brand[600], fontWeight: '500', fontFamily: 'SpaceGrotesk_500Medium' }} onPress={() => Linking.openURL('https://safekid.app/cgu')}>CGU</Text>
               {' '}et la{' '}
-              <Text style={{ color: colors.brand[600], fontWeight: '500', fontFamily: 'Space Grotesk' }} onPress={() => Linking.openURL('https://safekid.app/confidentialite')}>politique de confidentialité</Text>
+              <Text style={{ color: colors.brand[600], fontWeight: '500', fontFamily: 'SpaceGrotesk_500Medium' }} onPress={() => Linking.openURL('https://safekid.app/confidentialite')}>politique de confidentialité</Text>
             </Text>
           </Pressable>
 
@@ -125,8 +125,8 @@ export function RegisterScreen() {
           onPress={() => navigation.navigate('Login')}
           style={{ marginTop: spacing.xl, alignItems: 'center' }}
         >
-          <Text style={{ color: colors.gray[600], fontSize: 14, fontFamily: 'Space Grotesk' }}>
-            Déjà un compte ? <Text style={{ color: colors.brand[600], fontWeight: '600', fontFamily: 'Space Grotesk' }}>Se connecter</Text>
+          <Text style={{ color: colors.gray[600], fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular' }}>
+            Déjà un compte ? <Text style={{ color: colors.brand[600], fontWeight: '600', fontFamily: 'SpaceGrotesk_600SemiBold' }}>Se connecter</Text>
           </Text>
         </Pressable>
       </ScrollView>

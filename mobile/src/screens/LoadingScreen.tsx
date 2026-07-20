@@ -18,7 +18,7 @@ export function LoadingScreen() {
       <Text style={{
         fontSize: 24,
         fontWeight: '700',
-        fontFamily: 'Space Grotesk',
+        fontFamily: 'SpaceGrotesk_700Bold',
         color: colors.gray[900],
         marginTop: spacing.lg,
         letterSpacing: 0.5,
@@ -27,7 +27,7 @@ export function LoadingScreen() {
       </Text>
       <Text style={{
         fontSize: 13,
-        fontFamily: 'Space Grotesk',
+        fontFamily: 'SpaceGrotesk_400Regular',
         color: colors.gray[400],
         marginTop: 4,
       }}>

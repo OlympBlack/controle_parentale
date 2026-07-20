@@ -64,10 +64,50 @@ export interface Device {
   type: DeviceType
   os: string | null
   os_version: string | null
+  device_token: string | null
   status: DeviceStatus
+  permissions_accordees: Record<string, boolean> | null
+  derniere_synchronisation: string | null
   is_online: boolean
   battery_level: number | null
+  last_seen_at: string | null
+  paired_at: string | null
   child?: Child | null
+}
+
+export interface UsageSession {
+  id: number
+  device_id: number
+  package_name: string
+  nom_application: string | null
+  duree_secondes: number
+  date_utilisation: string
+  categorie: string | null
+  created_at: string | null
+}
+
+export interface AppUsageSummary {
+  id?: number
+  device_id?: number
+  date: string
+  temps_ecran_total_secondes: number
+  nombre_apps_utilisees: number
+}
+
+export interface ChildUsageToday {
+  sessions: UsageSession[]
+  resume: AppUsageSummary
+}
+
+export interface LocationData {
+  id: number
+  child_id: number
+  device_id: number
+  latitude: number
+  longitude: number
+  accuracy_meters: number | null
+  recorded_at: string
+  created_at: string
 }
 
 export type FilterRuleType = 'domain' | 'keyword' | 'category' | 'app'

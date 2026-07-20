@@ -1,5 +1,6 @@
 import { createNativeStackNavigator, type NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { useRoute, type RouteProp } from '@react-navigation/native'
 import { Users, Shield, Clock, Bell, BarChart3 } from 'lucide-react-native'
 import { colors } from '@/theme/colors'
 import { ChildrenScreen } from '@/screens/ChildrenScreen'
@@ -7,6 +8,9 @@ import { ChildDetailScreen } from '@/screens/ChildDetailScreen'
 import { RulesScreen } from '@/screens/RulesScreen'
 import { AlertsScreen } from '@/screens/AlertsScreen'
 import { ReportsScreen } from '@/screens/ReportsScreen'
+import { DevicesScreen } from '@/screens/parent/DevicesScreen'
+import { ScreenTimeScreen } from '@/screens/parent/ScreenTimeScreen'
+import { LocationScreen } from '@/screens/parent/LocationScreen'
 
 // ─── Tab Param List ─────────────────────────────────────────────────────────────
 export type TabParamList = {
@@ -74,11 +78,29 @@ function TabNavigator() {
 export type AppStackParamList = {
   Tabs: undefined
   ChildDetail: { childId: number; childName?: string }
+  Devices: { childId: number; childName?: string }
+  ScreenTime: { childId: number; childName?: string }
+  Location: { childId: number; childName?: string }
 }
 
 export type AppNavigation = NativeStackNavigationProp<AppStackParamList>
 
 const Stack = createNativeStackNavigator<AppStackParamList>()
+
+function DevicesScreenWrapper() {
+  const route = useRoute<RouteProp<AppStackParamList, 'Devices'>>()
+  return <DevicesScreen childId={route.params.childId} childName={route.params.childName} />
+}
+
+function ScreenTimeScreenWrapper() {
+  const route = useRoute<RouteProp<AppStackParamList, 'ScreenTime'>>()
+  return <ScreenTimeScreen childId={route.params.childId} childName={route.params.childName} />
+}
+
+function LocationScreenWrapper() {
+  const route = useRoute<RouteProp<AppStackParamList, 'Location'>>()
+  return <LocationScreen childId={route.params.childId} childName={route.params.childName} />
+}
 
 export function AppNavigator() {
   return (
@@ -93,6 +115,33 @@ export function AppNavigator() {
           headerStyle: { backgroundColor: colors.brand[600] },
           headerTitleStyle: { fontWeight: '600' },
         })}
+      />
+      <Stack.Screen
+        name="Devices"
+        component={DevicesScreenWrapper}
+        options={{
+          title: 'Appareils',
+          headerTintColor: colors.white,
+          headerStyle: { backgroundColor: colors.brand[600] },
+        }}
+      />
+      <Stack.Screen
+        name="ScreenTime"
+        component={ScreenTimeScreenWrapper}
+        options={{
+          title: "Temps d'écran",
+          headerTintColor: colors.white,
+          headerStyle: { backgroundColor: colors.brand[600] },
+        }}
+      />
+      <Stack.Screen
+        name="Location"
+        component={LocationScreenWrapper}
+        options={{
+          title: 'Localisation',
+          headerTintColor: colors.white,
+          headerStyle: { backgroundColor: colors.brand[600] },
+        }}
       />
     </Stack.Navigator>
   )

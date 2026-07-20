@@ -32,20 +32,20 @@ export function LoginScreen() {
             style={{ width: 80, height: 80, borderRadius: 20 }}
             resizeMode="contain"
           />
-          <Text style={{ fontSize: 28, fontWeight: '700', fontFamily: 'Space Grotesk', color: colors.gray[900], marginTop: spacing.lg }}>
+          <Text style={{ fontSize: 28, fontWeight: '700', fontFamily: 'SpaceGrotesk_700Bold', color: colors.gray[900], marginTop: spacing.lg }}>
             SafeKid
           </Text>
-          <Text style={{ fontSize: 14, fontFamily: 'Space Grotesk', color: colors.gray[500], marginTop: spacing.xs }}>
+          <Text style={{ fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular', color: colors.gray[500], marginTop: spacing.xs }}>
             Contrôle parental intelligent
           </Text>
         </View>
 
         {/* Hero text */}
         <View style={{ marginBottom: spacing.xl }}>
-          <Text style={{ fontSize: 22, fontWeight: '700', fontFamily: 'Space Grotesk', color: colors.gray[900] }}>
+          <Text style={{ fontSize: 22, fontWeight: '700', fontFamily: 'SpaceGrotesk_700Bold', color: colors.gray[900] }}>
             Connexion
           </Text>
-          <Text style={{ fontSize: 14, fontFamily: 'Space Grotesk', color: colors.gray[600], marginTop: spacing.xs }}>
+          <Text style={{ fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular', color: colors.gray[600], marginTop: spacing.xs }}>
             Bienvenue ! Connectez-vous pour accéder à votre tableau de bord.
           </Text>
         </View>
@@ -55,7 +55,7 @@ export function LoginScreen() {
           {error && (
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12, backgroundColor: colors.red[50], borderRadius: 8, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.red[100] }}>
               <AlertCircle size={20} color={colors.red[600]} />
-              <Text style={{ color: colors.red[700], fontSize: 13, fontFamily: 'Space Grotesk', flex: 1 }}>{error}</Text>
+              <Text style={{ color: colors.red[700], fontSize: 13, fontFamily: 'SpaceGrotesk_400Regular', flex: 1 }}>{error}</Text>
             </View>
           )}
 
@@ -78,7 +78,7 @@ export function LoginScreen() {
           />
 
           <Pressable onPress={() => Linking.openURL('https://safekid.app/forgot-password')} style={{ alignSelf: 'flex-end', marginBottom: spacing.sm }}>
-            <Text style={{ color: colors.brand[600], fontSize: 14, fontFamily: 'Space Grotesk', fontWeight: '500' }}>
+            <Text style={{ color: colors.brand[600], fontSize: 14, fontFamily: 'SpaceGrotesk_500Medium', fontWeight: '500' }}>
               Mot de passe oublié ?
             </Text>
           </Pressable>
@@ -90,8 +90,8 @@ export function LoginScreen() {
           onPress={() => navigation.navigate('Register')}
           style={{ marginTop: spacing.xl, alignItems: 'center' }}
         >
-          <Text style={{ color: colors.gray[600], fontSize: 14, fontFamily: 'Space Grotesk' }}>
-            Pas encore de compte ? <Text style={{ color: colors.brand[600], fontWeight: '600', fontFamily: 'Space Grotesk' }}>Créer un compte</Text>
+          <Text style={{ color: colors.gray[600], fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular' }}>
+            Pas encore de compte ? <Text style={{ color: colors.brand[600], fontWeight: '600', fontFamily: 'SpaceGrotesk_600SemiBold' }}>Créer un compte</Text>
           </Text>
         </Pressable>
       </ScrollView>
