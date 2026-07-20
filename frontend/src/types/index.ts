@@ -86,6 +86,7 @@ export interface Device {
   os: string | null
   os_version: string | null
   app_version: string | null
+  pairing_code: string | null
   device_token: string | null
   status: DeviceStatus
   permissions_accordees: Record<string, boolean> | null
@@ -100,6 +101,31 @@ export interface Device {
     last_name: string | null
     full_name: string
   } | null
+  installed_apps?: {
+    id: number
+    name: string
+    package_name: string
+    icon_url: string | null
+    platform: string | null
+    is_system_app: boolean
+    installed_at: string | null
+    version: string | null
+  }[]
+  recent_locations?: {
+    id: number
+    latitude: number
+    longitude: number
+    accuracy: number | null
+    recorded_at: string | null
+  }[]
+  recent_usage_sessions?: {
+    id: number
+    app_name: string | null
+    package_name: string | null
+    duration_seconds: number | null
+    date_utilisation: string | null
+    categorie: string | null
+  }[]
   created_at: string
   updated_at: string
 }

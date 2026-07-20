@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\PairDeviceRequest;
 use App\Http\Requests\StoreDeviceRequest;
 use App\Http\Requests\UpdateDeviceRequest;
 use App\Http\Resources\DeviceResource;
@@ -85,9 +86,26 @@ class DeviceController extends Controller
     #[OA\Response(response: 422, ref: '#/components/responses/ValidationError')]
     public function store(StoreDeviceRequest $request)
     {
-        $device = Device::create($request->validated());
+        $data = $request->validated();
+        $data['pairing_code'] = $this->generatePairingCode();
+        $data['device_token'] = $data['device_token'] ?? strtoupper(bin2hex(random_bytes(16)));
+
+        $device = Device::create($data);
 
         return $this->success(new DeviceResource($device), 'Appareil ajouté', 201);
+    }
+
+    private function generatePairingCode(int $length = 6): string
+    {
+        $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        do {
+            $code = '';
+            for ($i = 0; $i < $length; $i++) {
+                $code .= $chars[random_int(0, strlen($chars) - 1)];
+            }
+        } while (Device::where('pairing_code', $code)->exists());
+
+        return $code;
     }
 
     #[OA\Get(
@@ -113,6 +131,18 @@ class DeviceController extends Controller
     #[OA\Response(response: 404, ref: '#/components/responses/NotFound')]
     public function show(Device $device)
     {
+        $device->load([
+            'child',
+            'installedApps' => function ($q) {
+                $q->orderByDesc('device_installed_apps.installed_at')->limit(50);
+            },
+            'locations' => function ($q) {
+                $q->latest()->limit(20);
+            },
+            'usageSessions' => function ($q) {
+                $q->latest('date_utilisation')->limit(20);
+            },
+        ]);
         return $this->success(new DeviceResource($device), 'Détails de l\'appareil');
     }
 
@@ -169,5 +199,31 @@ class DeviceController extends Controller
     {
         $device->delete();
         return $this->success(null, 'Appareil supprimé');
+    }
+
+    public function pair(PairDeviceRequest $request)
+    {
+        $code = strtoupper(trim($request->input('pairing_code', '')));
+        $device = Device::where('pairing_code', $code)->first();
+
+        if (!$device) {
+            return $this->error('Code d\'appairage invalide ou appareil introuvable.', 404);
+        }
+
+        $device->update([
+            'name'          => $request->input('name', $device->name),
+            'brand'         => $request->input('brand', $device->brand),
+            'model'         => $request->input('model', $device->model),
+            'os'            => $request->input('os', $device->os),
+            'os_version'    => $request->input('os_version', $device->os_version),
+            'app_version'   => $request->input('app_version', $device->app_version),
+            'battery_level' => $request->input('battery_level', $device->battery_level),
+            'status'        => 'active',
+            'paired_at'     => now(),
+            'last_seen_at'  => now(),
+            'is_online'     => true,
+        ]);
+
+        return $this->success(new DeviceResource($device->fresh()->load('child')), 'Appareil appairé avec succès');
     }
 }

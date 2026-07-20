@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { AxiosError } from 'axios'
 import {
   Smartphone,
@@ -23,6 +24,7 @@ import {
   Bell,
   BarChart3,
 } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
 import { deviceService, type CreateDeviceData } from '@/services/device.service'
 import { childService } from '@/services/child.service'
 import { useFamilyContext } from '@/contexts/FamilyContext'
@@ -336,6 +338,7 @@ function DeviceCard({
   onEdit: () => void
   onDelete: () => void
 }) {
+  const navigate = useNavigate()
   const Icon = typeIcon(device.type)
   const childName = device.child?.full_name ?? null
   const perms = device.permissions_accordees
@@ -343,7 +346,10 @@ function DeviceCard({
     (Date.now() - new Date(device.derniere_synchronisation).getTime()) < 30 * 60 * 1000
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all hover:border-gray-300 hover:shadow-lg">
+    <div
+      className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all hover:border-gray-300 hover:shadow-lg cursor-pointer"
+      onClick={() => navigate(`/dashboard/admin/devices/${device.id}`)}
+    >
       {/* Top accent bar */}
       <div className={`h-1 w-full ${device.is_online ? 'bg-gradient-to-r from-emerald-400 to-emerald-600' : 'bg-gradient-to-r from-gray-300 to-gray-400'}`} />
 
@@ -367,7 +373,7 @@ function DeviceCard({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={onEdit}
               title="Modifier"
@@ -417,11 +423,15 @@ function DeviceCard({
           </div>
         )}
 
-        {/* Device token */}
-        {device.device_token && (
-          <div className="mt-3 flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
-            <span className="text-xs font-medium text-gray-400">Token :</span>
-            <code className="text-xs text-gray-500 truncate">{device.device_token.substring(0, 24)}...</code>
+        {/* Pairing code + QR */}
+        {device.pairing_code && (
+          <div className="mt-3 flex items-center gap-3 rounded-lg bg-brand-50 border border-brand-100 px-3 py-2">
+            <QRCodeSVG value={device.pairing_code} size={56} level="M" />
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-brand-700">Code d'appairage</span>
+              <code className="text-lg font-bold text-brand-900 tracking-wider">{device.pairing_code}</code>
+              <span className="text-[10px] text-brand-500">Scannez ce QR code dans l'app mobile</span>
+            </div>
           </div>
         )}
       </div>

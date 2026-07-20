@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import * as SecureStore from 'expo-secure-store'
-import * as Device from 'expo-device'
+import * as DeviceInfo from 'expo-device'
+import * as Battery from 'expo-battery'
 import { Platform } from 'react-native'
 import { SECURE_STORE_KEYS } from '@/constants/config'
 import { deviceService } from '@/services/device.service'
@@ -21,6 +22,8 @@ interface ChildAppState {
 
   setChild: (child: Child) => void
   registerDevice: (child: Child) => Promise<boolean>
+  pairDevice: (token: string) => Promise<boolean>
+  unpair: () => Promise<void>
   updatePermission: (key: string, value: boolean) => void
   syncPermissionsToBackend: () => Promise<void>
   setSyncing: (v: boolean) => void
@@ -50,12 +53,12 @@ export const useChildAppStore = create<ChildAppState>((set, get) => ({
       const deviceToken = `${child.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`
       const device = await deviceService.create({
         child_id: child.id,
-        name: Device.deviceName || `Appareil de ${child.first_name}`,
-        type: Platform.OS === 'ios' ? 'mobile' : (Device.deviceType === 2 ? 'tablette' : 'mobile'),
-        brand: Device.brand || null,
-        model: Device.modelName || null,
+        name: DeviceInfo.deviceName || `Appareil de ${child.first_name}`,
+        type: Platform.OS === 'ios' ? 'mobile' : (DeviceInfo.deviceType === 2 ? 'tablette' : 'mobile'),
+        brand: DeviceInfo.brand || undefined,
+        model: DeviceInfo.modelName || undefined,
         os: Platform.OS,
-        os_version: Device.osVersion || null,
+        os_version: DeviceInfo.osVersion || undefined,
         app_version: '1.0.0',
         device_token: deviceToken,
       })
@@ -74,6 +77,60 @@ export const useChildAppStore = create<ChildAppState>((set, get) => ({
     set((state) => ({
       permissions: { ...state.permissions, [key]: value },
     })),
+
+  pairDevice: async (token) => {
+    try {
+      const batteryLevel = await Battery.getBatteryLevelAsync()
+
+      const device = await deviceService.pair({
+        pairing_code: token.trim().toUpperCase(),
+        name: DeviceInfo.deviceName || undefined,
+        brand: DeviceInfo.brand || undefined,
+        model: DeviceInfo.modelName || undefined,
+        os: Platform.OS,
+        os_version: DeviceInfo.osVersion || undefined,
+        app_version: '1.0.0',
+        battery_level: batteryLevel >= 0 ? Math.round(batteryLevel * 100) : null,
+      })
+
+      await SecureStore.setItemAsync(SECURE_STORE_KEYS.DEVICE_ID, String(device.id))
+      if (device.child_id) {
+        await SecureStore.setItemAsync(SECURE_STORE_KEYS.CHILD_ID, String(device.child_id))
+      }
+      const perms = device.permissions_accordees ?? {
+        usage_access: false,
+        location: false,
+        notifications: false,
+      }
+      set({
+        deviceId: device.id,
+        device,
+        permissions: {
+          usage_access: perms.usage_access ?? false,
+          location: perms.location ?? false,
+          notifications: perms.notifications ?? false,
+        },
+      })
+      return true
+    } catch (e) {
+      console.error('[ChildApp] pairDevice error:', e)
+      return false
+    }
+  },
+
+  unpair: async () => {
+    await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.DEVICE_ID)
+    await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.CHILD_ID)
+    set({
+      selectedChild: null,
+      deviceId: null,
+      device: null,
+      permissions: { usage_access: false, location: false, notifications: false },
+      syncing: false,
+      lastSync: null,
+      syncResult: null,
+    })
+  },
 
   syncPermissionsToBackend: async () => {
     const { deviceId, permissions } = get()

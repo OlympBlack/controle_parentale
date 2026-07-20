@@ -66,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Devices
     Route::apiResource('devices', DeviceController::class);
+    Route::post  ('/devices/pair',                 [DeviceController::class, 'pair']);
     Route::post  ('/devices/{device}/usage',       [UsageController::class, 'storeUsage']);
     Route::post  ('/devices/{device}/location',    [UsageController::class, 'storeLocation']);
     Route::patch ('/devices/{device}/permissions', [UsageController::class, 'updatePermissions']);

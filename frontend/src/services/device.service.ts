@@ -28,6 +28,11 @@ export const deviceService = {
     return Array.isArray(data.data) ? data.data : []
   },
 
+  async getById(deviceId: number): Promise<Device> {
+    const { data } = await apiClient.get<ApiResponse<Device>>(`/devices/${deviceId}`)
+    return data.data
+  },
+
   async create(payload: CreateDeviceData): Promise<Device> {
     const { data } = await apiClient.post<ApiResponse<Device>>('/devices', payload)
     return data.data

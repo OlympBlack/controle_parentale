@@ -6,8 +6,11 @@ export interface DeviceData {
   child_id: number | null
   name: string
   type: DeviceType
+  brand: string | null
+  model: string | null
   os: string | null
   os_version: string | null
+  app_version: string | null
   device_token: string | null
   status: DeviceStatus
   permissions_accordees: Record<string, boolean> | null
@@ -16,6 +19,12 @@ export interface DeviceData {
   battery_level: number | null
   last_seen_at: string | null
   paired_at: string | null
+  child?: {
+    id: number
+    first_name: string
+    last_name: string | null
+    full_name: string
+  } | null
   created_at: string | null
   updated_at: string | null
 }
@@ -33,9 +42,25 @@ export interface CreateDevicePayload {
   battery_level?: number | null
 }
 
+export interface PairPayload {
+  pairing_code: string
+  name?: string
+  brand?: string | null
+  model?: string | null
+  os?: string
+  os_version?: string
+  app_version?: string
+  battery_level?: number | null
+}
+
 export const deviceService = {
   async create(payload: CreateDevicePayload): Promise<DeviceData> {
     const { data } = await apiClient.post<ApiResponse<DeviceData>>('/devices', payload)
+    return data.data
+  },
+
+  async pair(payload: PairPayload): Promise<DeviceData> {
+    const { data } = await apiClient.post<ApiResponse<DeviceData>>('/devices/pair', payload)
     return data.data
   },
 

@@ -9,7 +9,7 @@ class Device extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['child_id', 'name', 'type', 'os', 'os_version', 'app_version', 'pairing_code', 'pairing_code_expires_at', 'paired_at', 'status', 'last_seen_at', 'is_online', 'battery_level', 'device_token', 'permissions_accordees', 'derniere_synchronisation'];
+    protected $fillable = ['child_id', 'name', 'type', 'brand', 'model', 'os', 'os_version', 'app_version', 'pairing_code', 'pairing_code_expires_at', 'paired_at', 'status', 'last_seen_at', 'is_online', 'battery_level', 'device_token', 'permissions_accordees', 'derniere_synchronisation'];
 
     protected $casts = [
         'pairing_code_expires_at' => 'datetime',

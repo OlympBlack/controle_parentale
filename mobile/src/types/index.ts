@@ -62,8 +62,11 @@ export interface Device {
   child_id: number | null
   name: string
   type: DeviceType
+  brand: string | null
+  model: string | null
   os: string | null
   os_version: string | null
+  app_version: string | null
   device_token: string | null
   status: DeviceStatus
   permissions_accordees: Record<string, boolean> | null
@@ -72,7 +75,12 @@ export interface Device {
   battery_level: number | null
   last_seen_at: string | null
   paired_at: string | null
-  child?: Child | null
+  child?: {
+    id: number
+    first_name: string
+    last_name: string | null
+    full_name: string
+  } | null
 }
 
 export interface UsageSession {

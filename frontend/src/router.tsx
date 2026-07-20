@@ -13,6 +13,7 @@ import { AdminDashboard } from '@/pages/dashboard/admin/AdminDashboard'
 import { AdminFamilyPage } from '@/pages/dashboard/admin/AdminFamilyPage'
 import { AdminChildrenPage } from '@/pages/dashboard/admin/AdminChildrenPage'
 import { AdminDevicesPage } from '@/pages/dashboard/admin/AdminDevicesPage'
+import { AdminDeviceDetailPage } from '@/pages/dashboard/admin/AdminDeviceDetailPage'
 import { AdminFilterRulesPage } from '@/pages/dashboard/admin/AdminFilterRulesPage'
 import { AdminScreenTimePage } from '@/pages/dashboard/admin/AdminScreenTimePage'
 import { AdminUsagePage } from '@/pages/dashboard/admin/AdminUsagePage'
@@ -83,6 +84,7 @@ export function AppRouter() {
               <Route index element={<AdminDashboard />} />
               <Route path="children" element={<AdminChildrenPage />} />
               <Route path="devices" element={<AdminDevicesPage />} />
+              <Route path="devices/:id" element={<AdminDeviceDetailPage />} />
               <Route path="filter-rules" element={<AdminFilterRulesPage />} />
               <Route path="screen-time" element={<AdminScreenTimePage />} />
               <Route path="usage" element={<AdminUsagePage />} />

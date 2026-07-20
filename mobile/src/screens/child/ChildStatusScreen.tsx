@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { View, Text, Pressable, RefreshControl, ScrollView } from 'react-native'
-import { ShieldCheck, RefreshCw, LogOut } from 'lucide-react-native'
+import { ShieldCheck, RefreshCw, LogOut, Smartphone, BatteryFull, BatteryMedium, BatteryLow, Wifi, WifiOff, Unlink } from 'lucide-react-native'
 import { colors } from '@/theme/colors'
 import { spacing } from '@/theme'
 import { useChildAppStore } from '@/store/child-app.store'
@@ -8,7 +8,7 @@ import { useAuthStore } from '@/store/auth.store'
 import { syncUsageNow } from '@/services/collect.service'
 
 export function ChildStatusScreen() {
-  const { selectedChild, permissions, syncing, syncResult, lastSync, setSyncing, setSyncResult, setLastSync } = useChildAppStore()
+  const { device, permissions, syncing, syncResult, lastSync, setSyncing, setSyncResult, setLastSync, unpair } = useChildAppStore()
   const { logout } = useAuthStore()
   const [refreshing, setRefreshing] = useState(false)
 
@@ -30,7 +30,12 @@ export function ChildStatusScreen() {
     handleSync()
   }, [handleSync])
 
-  const allGranted = permissions.usage_access && permissions.location
+  const BatteryIcon = ({ level }: { level: number | null }) => {
+    if (level === null) return null
+    if (level <= 20) return <BatteryLow size={16} color={colors.red[600]} />
+    if (level <= 60) return <BatteryMedium size={16} color={colors.amber[600]} />
+    return <BatteryFull size={16} color={colors.emerald[600]} />
+  }
 
   return (
     <ScrollView
@@ -59,11 +64,79 @@ export function ChildStatusScreen() {
           fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular',
           color: colors.gray[500], textAlign: 'center',
         }}>
-          {selectedChild?.full_name ?? 'Enfant'} — SafeKid est actif
+          {device?.child?.full_name ?? 'Enfant'} — SafeKid est actif
         </Text>
       </View>
 
-      {/* Permissions status */}
+      {device && (
+        <View style={{
+          backgroundColor: colors.gray[50],
+          borderRadius: 16,
+          padding: spacing.lg,
+          marginBottom: spacing.lg,
+          borderWidth: 1,
+          borderColor: colors.gray[200],
+        }}>
+          <Text style={{
+            fontSize: 14, fontFamily: 'SpaceGrotesk_600SemiBold',
+            color: colors.gray[900], marginBottom: spacing.md,
+          }}>
+            Informations de l'appareil
+          </Text>
+
+          <InfoRow icon={<Smartphone size={16} color={colors.gray[500]} />} label="Nom" value={device.name} />
+          {device.brand ? <InfoRow label="Marque" value={device.brand} /> : null}
+          {device.model ? <InfoRow label="Modèle" value={device.model} /> : null}
+          {device.os ? <InfoRow label="OS" value={`${device.os}${device.os_version ? ` ${device.os_version}` : ''}`} /> : null}
+          {device.app_version ? <InfoRow label="App" value={`v${device.app_version}`} /> : null}
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              {device.is_online
+                ? <Wifi size={16} color={colors.emerald[600]} />
+                : <WifiOff size={16} color={colors.gray[400]} />}
+              <Text style={{ fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular', color: colors.gray[700] }}>
+                Statut
+              </Text>
+            </View>
+            <View style={{
+              paddingHorizontal: 10, paddingVertical: 3,
+              borderRadius: 8,
+              backgroundColor: device.is_online ? colors.emerald[100] : colors.gray[100],
+            }}>
+              <Text style={{
+                fontSize: 12, fontFamily: 'SpaceGrotesk_500Medium',
+                color: device.is_online ? colors.emerald[700] : colors.gray[500],
+              }}>
+                {device.is_online ? 'En ligne' : 'Hors ligne'}
+              </Text>
+            </View>
+          </View>
+
+          {device.battery_level !== null && (
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <BatteryIcon level={device.battery_level} />
+                <Text style={{ fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular', color: colors.gray[700] }}>
+                  Batterie
+                </Text>
+              </View>
+              <Text style={{ fontSize: 14, fontFamily: 'SpaceGrotesk_500Medium', color: colors.gray[900] }}>
+                {device.battery_level}%
+              </Text>
+            </View>
+          )}
+
+          {device.derniere_synchronisation && (
+            <InfoRow
+              icon={<RefreshCw size={16} color={colors.gray[500]} />}
+              label="Dernière sync"
+              value={new Date(device.derniere_synchronisation).toLocaleString('fr-FR')}
+            />
+          )}
+        </View>
+      )}
+
       <View style={{
         backgroundColor: colors.gray[50],
         borderRadius: 16,
@@ -79,21 +152,11 @@ export function ChildStatusScreen() {
           Permissions
         </Text>
 
-        <PermissionRow
-          label="Accès aux données d'usage"
-          granted={permissions.usage_access}
-        />
-        <PermissionRow
-          label="Localisation en arrière-plan"
-          granted={permissions.location}
-        />
-        <PermissionRow
-          label="Notifications"
-          granted={permissions.notifications}
-        />
+        <PermissionRow label="Accès aux données d'usage" granted={permissions.usage_access} />
+        <PermissionRow label="Localisation en arrière-plan" granted={permissions.location} />
+        <PermissionRow label="Notifications" granted={permissions.notifications} />
       </View>
 
-      {/* Sync status */}
       <View style={{
         backgroundColor: colors.gray[50],
         borderRadius: 16,
@@ -152,24 +215,60 @@ export function ChildStatusScreen() {
         </Pressable>
       </View>
 
-      {/* Logout */}
-      <Pressable
-        onPress={() => logout()}
-        style={({ pressed }) => ({
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-          paddingVertical: spacing.md,
-          opacity: pressed ? 0.7 : 1,
-        })}
-      >
-        <LogOut size={18} color={colors.red[600]} style={{ marginRight: spacing.sm }} />
-        <Text style={{
-          fontSize: 14, fontFamily: 'SpaceGrotesk_500Medium',
-          color: colors.red[600],
-        }}>
-          Déconnecter cet appareil
-        </Text>
-      </Pressable>
+      <View style={{ gap: spacing.md }}>
+        {device && (
+          <Pressable
+            onPress={() => unpair()}
+            style={({ pressed }) => ({
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+              paddingVertical: spacing.md,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Unlink size={18} color={colors.gray[600]} style={{ marginRight: spacing.sm }} />
+            <Text style={{
+              fontSize: 14, fontFamily: 'SpaceGrotesk_500Medium',
+              color: colors.gray[600],
+            }}>
+              Désappairer cet appareil
+            </Text>
+          </Pressable>
+        )}
+
+        <Pressable
+          onPress={() => logout()}
+          style={({ pressed }) => ({
+            flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+            paddingVertical: spacing.md,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <LogOut size={18} color={colors.red[600]} style={{ marginRight: spacing.sm }} />
+          <Text style={{
+            fontSize: 14, fontFamily: 'SpaceGrotesk_500Medium',
+            color: colors.red[600],
+          }}>
+            Déconnecter
+          </Text>
+        </Pressable>
+      </View>
     </ScrollView>
+  )
+}
+
+function InfoRow({ icon, label, value }: { icon?: React.ReactNode; label: string; value: string }) {
+  return (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        {icon}
+        <Text style={{ fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular', color: colors.gray[700] }}>
+          {label}
+        </Text>
+      </View>
+      <Text style={{ fontSize: 14, fontFamily: 'SpaceGrotesk_500Medium', color: colors.gray[900] }}>
+        {value}
+      </Text>
+    </View>
   )
 }
 

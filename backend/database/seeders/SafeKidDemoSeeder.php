@@ -68,7 +68,7 @@ class SafeKidDemoSeeder extends Seeder
 
         // ─── 4. Devices ──────────────────────────────────────────────────────
         $lucasPhone = Device::updateOrCreate(
-            ['device_token' => 'lucas-phone-token-demo'],
+            ['device_token' => 'LUCASPHONE2024TOKENABCDEF1234567890'],
             [
                 'child_id'         => $lucas->id,
                 'name'             => 'Téléphone de Lucas',
@@ -78,6 +78,7 @@ class SafeKidDemoSeeder extends Seeder
                 'os'               => 'android',
                 'os_version'       => '14',
                 'app_version'      => '1.0.0',
+                'pairing_code'     => 'LK4W7H',
                 'status'           => 'active',
                 'is_online'        => true,
                 'battery_level'    => 78,
@@ -93,7 +94,7 @@ class SafeKidDemoSeeder extends Seeder
         );
 
         $emmaTablet = Device::updateOrCreate(
-            ['device_token' => 'emma-tablet-token-demo'],
+            ['device_token' => 'EMMATAB2024TOKENXYZ987654321ABC'],
             [
                 'child_id'         => $emma->id,
                 'name'             => 'Tablette d\'Emma',
@@ -103,6 +104,7 @@ class SafeKidDemoSeeder extends Seeder
                 'os'               => 'android',
                 'os_version'       => '13',
                 'app_version'      => '1.0.0',
+                'pairing_code'     => 'EM9K2R',
                 'status'           => 'active',
                 'is_online'        => false,
                 'battery_level'    => 45,

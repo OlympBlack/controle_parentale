@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { View, Text, ScrollView, Pressable, Image, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AlertCircle } from 'lucide-react-native'
-import { useNavigation } from '@react-navigation/native'
-import type { AuthNavigation } from '@/navigation/AuthNavigator'
 import { useAuthStore } from '@/store/auth.store'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
@@ -11,7 +9,6 @@ import { colors } from '@/theme/colors'
 import { spacing } from '@/theme'
 
 export function LoginScreen() {
-  const navigation = useNavigation<AuthNavigation>()
   const { login, loading, error, fieldErrors, clearError } = useAuthStore()
 
   const [email, setEmail] = useState('')
@@ -87,11 +84,11 @@ export function LoginScreen() {
         </View>
 
         <Pressable
-          onPress={() => navigation.navigate('Register')}
+          onPress={() => Linking.openURL('https://safekid.app/register')}
           style={{ marginTop: spacing.xl, alignItems: 'center' }}
         >
           <Text style={{ color: colors.gray[600], fontSize: 14, fontFamily: 'SpaceGrotesk_400Regular' }}>
-            Pas encore de compte ? <Text style={{ color: colors.brand[600], fontWeight: '600', fontFamily: 'SpaceGrotesk_600SemiBold' }}>Créer un compte</Text>
+            Pas encore de compte ? <Text style={{ color: colors.brand[600], fontWeight: '600', fontFamily: 'SpaceGrotesk_600SemiBold' }}>Créer un compte sur le web</Text>
           </Text>
         </Pressable>
       </ScrollView>
