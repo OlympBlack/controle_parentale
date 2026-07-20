@@ -43,7 +43,8 @@
           "color": "#3b5bf9"
         }
       ],
-      "expo-splash-screen"
+      "expo-splash-screen",
+      "expo-font"
     ],
     "extra": {
       "apiUrl": "http://localhost:8000/api"

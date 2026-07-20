@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable } from 'react-native'
+import { View, Text, ScrollView, Pressable, Image, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Shield } from 'lucide-react-native'
+import { AlertCircle, Check } from 'lucide-react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { AuthNavigation } from '@/navigation/AuthNavigator'
 import { useAuthStore } from '@/store/auth.store'
@@ -12,22 +12,21 @@ import { spacing } from '@/theme'
 
 export function RegisterScreen() {
   const navigation = useNavigation<AuthNavigation>()
-  const { register, loading, error, clearError } = useAuthStore()
+  const { register, loading, error, fieldErrors, clearError } = useAuthStore()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
-  const [phone, setPhone] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   const handleRegister = async () => {
-    if (!name || !email || !password || !passwordConfirmation) return
+    if (!name || !email || !password || !passwordConfirmation || !acceptedTerms) return
     await register({
       name,
       email,
       password,
       passwordConfirmation,
-      phone: phone || undefined,
     })
   }
 
@@ -36,23 +35,29 @@ export function RegisterScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: spacing['2xl'] }}>
         {/* Logo */}
         <View style={{ alignItems: 'center', marginBottom: spacing['3xl'] }}>
-          <View style={{
-            width: 56, height: 56, borderRadius: 16,
-            backgroundColor: colors.brand[600],
-            justifyContent: 'center', alignItems: 'center',
-          }}>
-            <Shield size={28} color={colors.white} />
-          </View>
-          <Text style={{ fontSize: 24, fontWeight: '700', color: colors.gray[900], marginTop: spacing.md }}>
+          <Image
+            source={require('../../assets/safekid-logo.png')}
+            style={{ width: 72, height: 72, borderRadius: 18 }}
+            resizeMode="contain"
+          />
+        </View>
+
+        {/* Hero text */}
+        <View style={{ marginBottom: spacing.xl }}>
+          <Text style={{ fontSize: 22, fontWeight: '700', fontFamily: 'Space Grotesk', color: colors.gray[900] }}>
             Créer un compte
+          </Text>
+          <Text style={{ fontSize: 14, fontFamily: 'Space Grotesk', color: colors.gray[600], marginTop: spacing.xs }}>
+            Commencez votre essai gratuit. Aucune carte requise.
           </Text>
         </View>
 
         {/* Form */}
         <View style={{ backgroundColor: colors.white, borderRadius: 16, padding: spacing.xl, ...{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 } }}>
           {error && (
-            <View style={{ backgroundColor: colors.red[50], borderRadius: 8, padding: spacing.md, marginBottom: spacing.md }}>
-              <Text style={{ color: colors.red[700], fontSize: 13 }}>{error}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12, backgroundColor: colors.red[50], borderRadius: 8, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.red[100] }}>
+              <AlertCircle size={20} color={colors.red[600]} />
+              <Text style={{ color: colors.red[700], fontSize: 13, fontFamily: 'Space Grotesk', flex: 1 }}>{error}</Text>
             </View>
           )}
 
@@ -62,6 +67,7 @@ export function RegisterScreen() {
             onChangeText={(text) => { setName(text); clearError() }}
             placeholder="Jean Dupont"
             autoCapitalize="words"
+            error={fieldErrors.name?.[0]}
           />
 
           <Input
@@ -70,14 +76,7 @@ export function RegisterScreen() {
             onChangeText={(text) => { setEmail(text); clearError() }}
             placeholder="vous@exemple.com"
             keyboardType="email-address"
-          />
-
-          <Input
-            label="Téléphone (optionnel)"
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="06 12 34 56 78"
-            keyboardType="phone-pad"
+            error={fieldErrors.email?.[0]}
           />
 
           <Input
@@ -86,6 +85,7 @@ export function RegisterScreen() {
             onChangeText={(text) => { setPassword(text); clearError() }}
             placeholder="••••••••"
             secureTextEntry
+            error={fieldErrors.password?.[0]}
           />
 
           <Input
@@ -94,19 +94,41 @@ export function RegisterScreen() {
             onChangeText={(text) => { setPasswordConfirmation(text); clearError() }}
             placeholder="••••••••"
             secureTextEntry
+            error={fieldErrors.password_confirmation?.[0]}
           />
 
-          <Button label="S'inscrire" onPress={handleRegister} loading={loading} style={{ marginTop: spacing.sm }} />
-
+          {/* Terms checkbox */}
           <Pressable
-            onPress={() => navigation.navigate('Login')}
-            style={{ marginTop: spacing.lg, alignItems: 'center' }}
+            onPress={() => setAcceptedTerms((v) => !v)}
+            style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: spacing.md, marginTop: spacing.xs }}
           >
-            <Text style={{ color: colors.gray[500], fontSize: 14 }}>
-              Déjà un compte ? <Text style={{ color: colors.brand[600], fontWeight: '600' }}>Se connecter</Text>
+            <View style={{
+              width: 20, height: 20, borderRadius: 6, marginTop: 2,
+              borderWidth: 2, borderColor: acceptedTerms ? colors.brand[600] : colors.gray[300],
+              backgroundColor: acceptedTerms ? colors.brand[600] : 'transparent',
+              justifyContent: 'center', alignItems: 'center',
+            }}>
+              {acceptedTerms && <Check size={12} color={colors.white} strokeWidth={3} />}
+            </View>
+            <Text style={{ fontSize: 13, fontFamily: 'Space Grotesk', color: colors.gray[600], flex: 1 }}>
+              J'accepte les{' '}
+              <Text style={{ color: colors.brand[600], fontWeight: '500', fontFamily: 'Space Grotesk' }} onPress={() => Linking.openURL('https://safekid.app/cgu')}>CGU</Text>
+              {' '}et la{' '}
+              <Text style={{ color: colors.brand[600], fontWeight: '500', fontFamily: 'Space Grotesk' }} onPress={() => Linking.openURL('https://safekid.app/confidentialite')}>politique de confidentialité</Text>
             </Text>
           </Pressable>
+
+          <Button label="Créer mon compte" onPress={handleRegister} loading={loading} disabled={!acceptedTerms} />
         </View>
+
+        <Pressable
+          onPress={() => navigation.navigate('Login')}
+          style={{ marginTop: spacing.xl, alignItems: 'center' }}
+        >
+          <Text style={{ color: colors.gray[600], fontSize: 14, fontFamily: 'Space Grotesk' }}>
+            Déjà un compte ? <Text style={{ color: colors.brand[600], fontWeight: '600', fontFamily: 'Space Grotesk' }}>Se connecter</Text>
+          </Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   )

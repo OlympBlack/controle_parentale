@@ -40,7 +40,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={textStyle.color} size="small" />
       ) : (
-        <Text style={{ ...textStyle, fontSize: sizeStyle.fontSize } as TextStyle}>
+        <Text style={{ ...textStyle, fontSize: sizeStyle.fontSize, fontFamily: 'Space Grotesk' } as TextStyle}>
           {label}
         </Text>
       )}

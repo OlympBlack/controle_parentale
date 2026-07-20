@@ -11,6 +11,7 @@ interface AuthState {
   isInitializing: boolean
   loading: boolean
   error: string | null
+  fieldErrors: Record<string, string[]>
 
   initialize: () => Promise<void>
   login: (email: string, password: string) => Promise<boolean>
@@ -32,6 +33,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isInitializing: true,
   loading: false,
   error: null,
+  fieldErrors: {},
 
   initialize: async () => {
     try {
@@ -49,29 +51,53 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   login: async (email, password) => {
-    set({ loading: true, error: null })
+    set({ loading: true, error: null, fieldErrors: {} })
     try {
       const res = await authService.login(email, password)
       await SecureStore.setItemAsync(SECURE_STORE_KEYS.AUTH_TOKEN, res.token)
       set({ user: res.user, token: res.token, isAuthenticated: true, loading: false })
       return true
-    } catch (error) {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message
-      set({ loading: false, error: msg ?? 'Connexion échouée.' })
+    } catch (err) {
+      const e = err as { response?: { status?: number; data?: { message?: string; errors?: Record<string, string[]> } } }
+      const status = e?.response?.status
+      const fieldErrors = e?.response?.data?.errors ?? {}
+      let msg = ''
+      if (status === 422) {
+        msg = e?.response?.data?.message ?? 'Veuillez corriger les erreurs ci-dessous.'
+      } else if (status === 401) {
+        msg = e?.response?.data?.message ?? 'Identifiants incorrects.'
+      } else if (status === 403) {
+        msg = e?.response?.data?.message ?? 'Votre compte est inactif. Contactez le support.'
+      } else if (status === 429) {
+        msg = 'Trop de tentatives. Veuillez patienter avant de réessayer.'
+      } else {
+        msg = 'Une erreur est survenue. Veuillez réessayer.'
+      }
+      set({ loading: false, error: msg, fieldErrors })
       return false
     }
   },
 
   register: async (data) => {
-    set({ loading: true, error: null })
+    set({ loading: true, error: null, fieldErrors: {} })
     try {
       const res = await authService.register(data)
       await SecureStore.setItemAsync(SECURE_STORE_KEYS.AUTH_TOKEN, res.token)
       set({ user: res.user, token: res.token, isAuthenticated: true, loading: false })
       return true
-    } catch (error) {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message
-      set({ loading: false, error: msg ?? 'Inscription échouée.' })
+    } catch (err) {
+      const e = err as { response?: { status?: number; data?: { message?: string; errors?: Record<string, string[]> } } }
+      const status = e?.response?.status
+      const fieldErrors = e?.response?.data?.errors ?? {}
+      let msg = ''
+      if (status === 422) {
+        msg = e?.response?.data?.message ?? 'Veuillez corriger les erreurs ci-dessous.'
+      } else if (status === 429) {
+        msg = 'Trop de tentatives. Veuillez patienter avant de réessayer.'
+      } else {
+        msg = 'Une erreur est survenue. Veuillez réessayer.'
+      }
+      set({ loading: false, error: msg, fieldErrors })
       return false
     }
   },
@@ -87,5 +113,5 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  clearError: () => set({ error: null }),
+  clearError: () => set({ error: null, fieldErrors: {} }),
 }))

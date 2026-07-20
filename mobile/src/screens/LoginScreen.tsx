@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native'
+import { View, Text, ScrollView, Pressable, Image, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Shield } from 'lucide-react-native'
+import { AlertCircle } from 'lucide-react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { AuthNavigation } from '@/navigation/AuthNavigator'
 import { useAuthStore } from '@/store/auth.store'
@@ -12,7 +12,7 @@ import { spacing } from '@/theme'
 
 export function LoginScreen() {
   const navigation = useNavigation<AuthNavigation>()
-  const { login, loading, error, clearError } = useAuthStore()
+  const { login, loading, error, fieldErrors, clearError } = useAuthStore()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -27,30 +27,35 @@ export function LoginScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: spacing['2xl'] }}>
         {/* Logo */}
         <View style={{ alignItems: 'center', marginBottom: spacing['4xl'] }}>
-          <View style={{
-            width: 64, height: 64, borderRadius: 20,
-            backgroundColor: colors.brand[600],
-            justifyContent: 'center', alignItems: 'center',
-          }}>
-            <Shield size={32} color={colors.white} />
-          </View>
-          <Text style={{ fontSize: 28, fontWeight: '700', color: colors.gray[900], marginTop: spacing.lg }}>
+          <Image
+            source={require('../../assets/safekid-logo.png')}
+            style={{ width: 80, height: 80, borderRadius: 20 }}
+            resizeMode="contain"
+          />
+          <Text style={{ fontSize: 28, fontWeight: '700', fontFamily: 'Space Grotesk', color: colors.gray[900], marginTop: spacing.lg }}>
             SafeKid
           </Text>
-          <Text style={{ fontSize: 14, color: colors.gray[500], marginTop: spacing.xs }}>
+          <Text style={{ fontSize: 14, fontFamily: 'Space Grotesk', color: colors.gray[500], marginTop: spacing.xs }}>
             Contrôle parental intelligent
+          </Text>
+        </View>
+
+        {/* Hero text */}
+        <View style={{ marginBottom: spacing.xl }}>
+          <Text style={{ fontSize: 22, fontWeight: '700', fontFamily: 'Space Grotesk', color: colors.gray[900] }}>
+            Connexion
+          </Text>
+          <Text style={{ fontSize: 14, fontFamily: 'Space Grotesk', color: colors.gray[600], marginTop: spacing.xs }}>
+            Bienvenue ! Connectez-vous pour accéder à votre tableau de bord.
           </Text>
         </View>
 
         {/* Form */}
         <View style={{ backgroundColor: colors.white, borderRadius: 16, padding: spacing.xl, ...{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 } }}>
-          <Text style={{ fontSize: 20, fontWeight: '700', color: colors.gray[900], marginBottom: spacing.lg }}>
-            Connexion
-          </Text>
-
           {error && (
-            <View style={{ backgroundColor: colors.red[50], borderRadius: 8, padding: spacing.md, marginBottom: spacing.md }}>
-              <Text style={{ color: colors.red[700], fontSize: 13 }}>{error}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12, backgroundColor: colors.red[50], borderRadius: 8, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.red[100] }}>
+              <AlertCircle size={20} color={colors.red[600]} />
+              <Text style={{ color: colors.red[700], fontSize: 13, fontFamily: 'Space Grotesk', flex: 1 }}>{error}</Text>
             </View>
           )}
 
@@ -60,6 +65,7 @@ export function LoginScreen() {
             onChangeText={(text) => { setEmail(text); clearError() }}
             placeholder="vous@exemple.com"
             keyboardType="email-address"
+            error={fieldErrors.email?.[0]}
           />
 
           <Input
@@ -68,19 +74,26 @@ export function LoginScreen() {
             onChangeText={(text) => { setPassword(text); clearError() }}
             placeholder="••••••••"
             secureTextEntry
+            error={fieldErrors.password?.[0]}
           />
 
-          <Button label="Se connecter" onPress={handleLogin} loading={loading} style={{ marginTop: spacing.sm }} />
-
-          <Pressable
-            onPress={() => navigation.navigate('Register')}
-            style={{ marginTop: spacing.lg, alignItems: 'center' }}
-          >
-            <Text style={{ color: colors.gray[500], fontSize: 14 }}>
-              Pas de compte ? <Text style={{ color: colors.brand[600], fontWeight: '600' }}>S'inscrire</Text>
+          <Pressable onPress={() => Linking.openURL('https://safekid.app/forgot-password')} style={{ alignSelf: 'flex-end', marginBottom: spacing.sm }}>
+            <Text style={{ color: colors.brand[600], fontSize: 14, fontFamily: 'Space Grotesk', fontWeight: '500' }}>
+              Mot de passe oublié ?
             </Text>
           </Pressable>
+
+          <Button label="Se connecter" onPress={handleLogin} loading={loading} />
         </View>
+
+        <Pressable
+          onPress={() => navigation.navigate('Register')}
+          style={{ marginTop: spacing.xl, alignItems: 'center' }}
+        >
+          <Text style={{ color: colors.gray[600], fontSize: 14, fontFamily: 'Space Grotesk' }}>
+            Pas encore de compte ? <Text style={{ color: colors.brand[600], fontWeight: '600', fontFamily: 'Space Grotesk' }}>Créer un compte</Text>
+          </Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   )
