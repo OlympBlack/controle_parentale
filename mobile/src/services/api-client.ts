@@ -14,6 +14,10 @@ export const apiClient = axios.create({
   },
 })
 
+if (__DEV__) {
+  console.log('[SafeKid] API base URL:', API_BASE_URL)
+}
+
 // ─── Auth token injection ──────────────────────────────────────────────────────
 apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   const token = await SecureStore.getItemAsync(SECURE_STORE_KEYS.AUTH_TOKEN)

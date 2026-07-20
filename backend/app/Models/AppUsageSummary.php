@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class AppUsageSummary extends Model
 {
+    protected $table = 'app_usage_summary';
+
     protected $fillable = [
         'device_id',
         'date',

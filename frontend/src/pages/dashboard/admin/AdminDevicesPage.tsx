@@ -15,6 +15,13 @@ import {
   BatteryFull,
   Wifi,
   WifiOff,
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Shield,
+  Bell,
+  BarChart3,
 } from 'lucide-react'
 import { deviceService, type CreateDeviceData } from '@/services/device.service'
 import { childService } from '@/services/child.service'
@@ -311,6 +318,15 @@ function DeleteConfirm({
 
 // ─── Device Card ─────────────────────────────────────────────────────────────────
 
+function PermissionBadge({ granted, icon: Icon, label }: { granted: boolean | undefined; icon: typeof Shield; label: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${granted ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+      {granted ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+      {label}
+    </span>
+  )
+}
+
 function DeviceCard({
   device,
   onEdit,
@@ -322,6 +338,9 @@ function DeviceCard({
 }) {
   const Icon = typeIcon(device.type)
   const childName = device.child?.full_name ?? null
+  const perms = device.permissions_accordees
+  const syncedRecently = device.derniere_synchronisation &&
+    (Date.now() - new Date(device.derniere_synchronisation).getTime()) < 30 * 60 * 1000
 
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all hover:border-gray-300 hover:shadow-lg">
@@ -338,7 +357,11 @@ function DeviceCard({
             <div>
               <h3 className="text-base font-semibold text-gray-900">{device.name || 'Appareil sans nom'}</h3>
               <p className="mt-0.5 text-xs text-gray-500">
-                {typeLabel(device.type)}{device.os ? ` · ${device.os}` : ''}{device.os_version ? ` ${device.os_version}` : ''}
+                {typeLabel(device.type)}
+                {device.brand ? ` · ${device.brand}` : ''}
+                {device.model ? ` ${device.model}` : ''}
+                {device.os ? ` · ${device.os}` : ''}{device.os_version ? ` ${device.os_version}` : ''}
+                {device.app_version ? ` · v${device.app_version}` : ''}
               </p>
             </div>
           </div>
@@ -376,7 +399,31 @@ function DeviceCard({
             {device.is_online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
             {device.is_online ? 'En ligne' : 'Hors ligne'}
           </span>
+          {device.derniere_synchronisation && (
+            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${syncedRecently ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+              <RefreshCw className="h-3 w-3" />
+              Sync {timeAgo(device.derniere_synchronisation)}
+            </span>
+          )}
         </div>
+
+        {/* Permissions */}
+        {perms && (
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-medium text-gray-400">Permissions :</span>
+            <PermissionBadge granted={perms.usage_access} icon={BarChart3} label="Usage" />
+            <PermissionBadge granted={perms.location} icon={Shield} label="Localisation" />
+            <PermissionBadge granted={perms.notifications} icon={Bell} label="Notif." />
+          </div>
+        )}
+
+        {/* Device token */}
+        {device.device_token && (
+          <div className="mt-3 flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
+            <span className="text-xs font-medium text-gray-400">Token :</span>
+            <code className="text-xs text-gray-500 truncate">{device.device_token.substring(0, 24)}...</code>
+          </div>
+        )}
       </div>
 
       {/* Footer */}
@@ -392,6 +439,11 @@ function DeviceCard({
             Vu : {timeAgo(device.last_seen_at)}
           </span>
         </div>
+        {device.paired_at && (
+          <span className="text-xs text-gray-400">
+            Appairé : {new Date(device.paired_at).toLocaleDateString('fr-FR')}
+          </span>
+        )}
       </div>
     </div>
   )

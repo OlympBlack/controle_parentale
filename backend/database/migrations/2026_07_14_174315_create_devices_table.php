@@ -13,6 +13,8 @@ return new class extends Migration
             $table->foreignId('child_id')->nullable()->constrained('children')->nullOnDelete();
             $table->string('name');
             $table->enum('type', ['mobile', 'tablette', 'pc', 'autre']);
+            $table->string('brand')->nullable();
+            $table->string('model')->nullable();
             $table->enum('os', ['android', 'ios', 'windows', 'macos', 'autre']);
             $table->string('os_version')->nullable();
             $table->string('app_version')->nullable();

@@ -24,9 +24,13 @@ export interface CreateDevicePayload {
   child_id: number
   name: string
   type: string
+  brand?: string | null
+  model?: string | null
   os?: string
   os_version?: string
+  app_version?: string
   device_token?: string
+  battery_level?: number | null
 }
 
 export const deviceService = {
@@ -60,7 +64,14 @@ export const deviceService = {
       date_utilisation: string
     }>
   ): Promise<void> {
-    await apiClient.post(`/devices/${deviceId}/usage`, { sessions })
+    console.log('[SafeKid] sendUsage → device:', deviceId, 'sessions:', sessions.length)
+    try {
+      const res = await apiClient.post(`/devices/${deviceId}/usage`, { sessions })
+      console.log('[SafeKid] sendUsage ✓ status:', res.status)
+    } catch (e: any) {
+      console.error('[SafeKid] sendUsage ✗', e?.response?.status, e?.response?.data ?? e?.message)
+      throw e
+    }
   },
 
   async sendLocation(

@@ -14,6 +14,8 @@ class DeviceResource extends JsonResource
             'child_id' => $this->child_id,
             'name' => $this->name,
             'type' => $this->type,
+            'brand' => $this->brand,
+            'model' => $this->model,
             'os' => $this->os,
             'os_version' => $this->os_version,
             'app_version' => $this->app_version,

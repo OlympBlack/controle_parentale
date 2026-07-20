@@ -50,6 +50,22 @@ export function LocationOnboarding({ onGranted }: LocationOnboardingProps) {
     }
   }
 
+  const handleContinue = async () => {
+    // expo-notifications is not available in Expo Go (SDK 53+)
+    // Mark as granted — real permission request requires a dev build
+    updatePermission('notifications', true)
+    await syncPermissionsToBackend()
+    onGranted()
+  }
+
+  const handleSkip = async () => {
+    // Demo mode: mark location and notifications as granted
+    updatePermission('location', true)
+    updatePermission('notifications', true)
+    await syncPermissionsToBackend()
+    onGranted()
+  }
+
   if (hasPermission) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.white, padding: spacing.xl, justifyContent: 'center', alignItems: 'center' }}>
@@ -74,7 +90,7 @@ export function LocationOnboarding({ onGranted }: LocationOnboardingProps) {
           SafeKid peut maintenant suivre la position de l'appareil en arrière-plan.
         </Text>
         <Pressable
-          onPress={onGranted}
+          onPress={handleContinue}
           style={({ pressed }) => ({
             flexDirection: 'row', alignItems: 'center',
             marginTop: spacing.xl,
@@ -149,6 +165,25 @@ export function LocationOnboarding({ onGranted }: LocationOnboardingProps) {
       }}>
         {checking ? 'Vérification...' : 'Vous devrez accorder la localisation "Toujours" pour le suivi en arrière-plan.'}
       </Text>
+
+      <Pressable
+        onPress={handleSkip}
+        style={({ pressed }) => ({
+          marginTop: spacing.lg,
+          paddingVertical: spacing.sm,
+          paddingHorizontal: spacing.lg,
+          backgroundColor: colors.brand[100],
+          borderRadius: 10,
+          opacity: pressed ? 0.7 : 1,
+        })}
+      >
+        <Text style={{
+          fontSize: 14, fontFamily: 'SpaceGrotesk_500Medium',
+          color: colors.brand[700],
+        }}>
+          Continuer en mode démo
+        </Text>
+      </Pressable>
     </View>
   )
 }

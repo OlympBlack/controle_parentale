@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { View, Text, Pressable, AppState } from 'react-native'
+import { View, Text, Pressable, AppState, Alert } from 'react-native'
 import { BarChart3, ChevronRight } from 'lucide-react-native'
 import { colors } from '@/theme/colors'
 import { spacing } from '@/theme'
 import { useChildAppStore } from '@/store/child-app.store'
 import { checkUsageAccessPermission, openUsageAccessSettings } from '@/services/collect.service'
+import UsageAccess from '../../../modules/expo-usage-access'
 
 interface UsageAccessOnboardingProps {
   onGranted: () => void
@@ -14,6 +15,7 @@ export function UsageAccessOnboarding({ onGranted }: UsageAccessOnboardingProps)
   const [hasPermission, setHasPermission] = useState(false)
   const [checking, setChecking] = useState(false)
   const { updatePermission, syncPermissionsToBackend } = useChildAppStore()
+  const moduleAvailable = UsageAccess.isAvailable()
 
   useEffect(() => {
     checkPermission()
@@ -37,7 +39,30 @@ export function UsageAccessOnboarding({ onGranted }: UsageAccessOnboardingProps)
   }
 
   const handleOpenSettings = async () => {
-    await openUsageAccessSettings()
+    try {
+      if (moduleAvailable) {
+        await openUsageAccessSettings()
+      } else {
+        Alert.alert(
+          'Mode démo',
+          "Le module natif d'accès aux usages n'est pas disponible en Expo Go. Pour utiliser cette fonctionnalité, créez un dev build avec : npx expo run:android. Vous pouvez continuer en mode démo.",
+          [
+            { text: 'Continuer en démo', onPress: handleSkip },
+            { text: 'Annuler' },
+          ]
+        )
+      }
+    } catch (e) {
+      console.warn('[UsageAccessOnboarding] Cannot open settings:', e)
+      Alert.alert('Erreur', "Impossible d'ouvrir les paramètres d'accès.")
+    }
+  }
+
+  const handleSkip = () => {
+    // In demo mode, mark as granted so the status screen and sync work
+    updatePermission('usage_access', true)
+    void syncPermissionsToBackend()
+    onGranted()
   }
 
   if (hasPermission) {
@@ -128,7 +153,7 @@ export function UsageAccessOnboarding({ onGranted }: UsageAccessOnboardingProps)
           fontSize: 16, fontFamily: 'SpaceGrotesk_500Medium',
           color: colors.white,
         }}>
-          Ouvrir les paramètres d'accès
+          {moduleAvailable ? 'Ouvrir les paramètres d\'accès' : 'Mode démo (Expo Go)'}
         </Text>
       </Pressable>
 
@@ -137,8 +162,31 @@ export function UsageAccessOnboarding({ onGranted }: UsageAccessOnboardingProps)
         color: colors.gray[400], textAlign: 'center',
         marginTop: spacing.md,
       }}>
-        {checking ? 'Vérification des permissions...' : 'Revenez sur cette app après avoir accordé la permission.'}
+        {checking
+          ? 'Vérification des permissions...'
+          : moduleAvailable
+            ? 'Revenez sur cette app après avoir accordé la permission.'
+            : 'Le module natif nécessite un dev build (npx expo run:android).'}
       </Text>
+
+      <Pressable
+        onPress={handleSkip}
+        style={({ pressed }) => ({
+          marginTop: spacing.lg,
+          paddingVertical: spacing.sm,
+          paddingHorizontal: spacing.lg,
+          backgroundColor: moduleAvailable ? 'transparent' : colors.brand[100],
+          borderRadius: moduleAvailable ? 0 : 10,
+          opacity: pressed ? 0.7 : 1,
+        })}
+      >
+        <Text style={{
+          fontSize: 14, fontFamily: 'SpaceGrotesk_500Medium',
+          color: moduleAvailable ? colors.gray[400] : colors.brand[700],
+        }}>
+          {moduleAvailable ? 'Passer pour le moment' : 'Continuer en mode démo'}
+        </Text>
+      </Pressable>
     </View>
   )
 }

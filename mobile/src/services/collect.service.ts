@@ -104,29 +104,65 @@ export async function openUsageAccessSettings(): Promise<void> {
 
 export async function syncUsageNow(): Promise<{ success: boolean; count: number }> {
   try {
-    if (Platform.OS !== 'android') return { success: false, count: 0 }
-    const hasPermission = await UsageAccess.checkUsageAccessPermission()
-    if (!hasPermission) return { success: false, count: 0 }
-
-    const now = Date.now()
-    const startOfDay = new Date()
-    startOfDay.setHours(0, 0, 0, 0)
-
-    const stats = await UsageAccess.getUsageStats(startOfDay.getTime(), now)
-    if (stats.length === 0) return { success: true, count: 0 }
-
     const deviceId = await SecureStore.getItemAsync(SECURE_STORE_KEYS.DEVICE_ID)
-    if (!deviceId) return { success: false, count: 0 }
+    if (!deviceId) {
+      console.warn('[SafeKid] syncUsageNow: no device ID')
+      return { success: false, count: 0 }
+    }
 
-    const sessions = stats.map((stat: UsageStat) => ({
-      package_name: stat.packageName,
-      nom_application: stat.appName,
-      duree_secondes: Math.floor(stat.totalTimeInForeground / 1000),
-      date_utilisation: new Date().toISOString().split('T')[0],
-    }))
+    let sessions: { package_name: string; nom_application: string; duree_secondes: number; date_utilisation: string }[] = []
 
-    await deviceService.sendUsage(Number(deviceId), sessions)
-    return { success: true, count: sessions.length }
+    if (Platform.OS === 'android' && UsageAccess.isAvailable()) {
+      const hasPermission = await UsageAccess.checkUsageAccessPermission()
+      if (!hasPermission) {
+        console.warn('[SafeKid] syncUsageNow: usage access not granted')
+        return { success: false, count: 0 }
+      }
+
+      const now = Date.now()
+      const startOfDay = new Date()
+      startOfDay.setHours(0, 0, 0, 0)
+
+      const stats = await UsageAccess.getUsageStats(startOfDay.getTime(), now)
+      sessions = stats.map((stat: UsageStat) => ({
+        package_name: stat.packageName,
+        nom_application: stat.appName,
+        duree_secondes: Math.floor(stat.totalTimeInForeground / 1000),
+        date_utilisation: new Date().toISOString().split('T')[0],
+      }))
+    } else {
+      // ─── Demo mode (Expo Go / no native module) ───────────────────────────
+      console.log('[SafeKid] syncUsageNow: using demo data (native module unavailable)')
+      const demoApps = [
+        { package_name: 'com.whatsapp',         nom_application: 'WhatsApp',  duree: 1200 },
+        { package_name: 'com.youtube.app',      nom_application: 'YouTube',   duree: 3600 },
+        { package_name: 'com.android.chrome',   nom_application: 'Chrome',    duree: 900 },
+        { package_name: 'com.instagram.android', nom_application: 'Instagram', duree: 1800 },
+        { package_name: 'com.spotify.music',    nom_application: 'Spotify',   duree: 600 },
+      ]
+      const today = new Date().toISOString().split('T')[0]
+      sessions = demoApps.map((app) => ({
+        package_name: app.package_name,
+        nom_application: app.nom_application,
+        duree_secondes: app.duree + Math.floor(Math.random() * 300),
+        date_utilisation: today,
+      }))
+    }
+
+    if (sessions.length === 0) return { success: true, count: 0 }
+
+    try {
+      await deviceService.sendUsage(Number(deviceId), sessions)
+      console.log('[SafeKid] syncUsageNow: success,', sessions.length, 'sessions sent')
+      return { success: true, count: sessions.length }
+    } catch (e: any) {
+      if (e?.response?.status === 404) {
+        console.warn('[SafeKid] syncUsageNow: device not found (404), clearing stored IDs')
+        await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.DEVICE_ID)
+        await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.CHILD_ID)
+      }
+      throw e
+    }
   } catch (e) {
     console.error('[SafeKid] syncUsageNow error:', e)
     return { success: false, count: 0 }

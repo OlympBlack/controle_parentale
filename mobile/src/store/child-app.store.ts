@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import * as SecureStore from 'expo-secure-store'
+import * as Device from 'expo-device'
+import { Platform } from 'react-native'
 import { SECURE_STORE_KEYS } from '@/constants/config'
 import { deviceService } from '@/services/device.service'
 import type { Child, Device } from '@/types'
@@ -48,9 +50,13 @@ export const useChildAppStore = create<ChildAppState>((set, get) => ({
       const deviceToken = `${child.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`
       const device = await deviceService.create({
         child_id: child.id,
-        name: `Appareil de ${child.first_name}`,
-        type: 'mobile',
-        os: 'android',
+        name: Device.deviceName || `Appareil de ${child.first_name}`,
+        type: Platform.OS === 'ios' ? 'mobile' : (Device.deviceType === 2 ? 'tablette' : 'mobile'),
+        brand: Device.brand || null,
+        model: Device.modelName || null,
+        os: Platform.OS,
+        os_version: Device.osVersion || null,
+        app_version: '1.0.0',
         device_token: deviceToken,
       })
 
@@ -105,7 +111,10 @@ export const useChildAppStore = create<ChildAppState>((set, get) => ({
           },
         })
       } catch {
-        // Device may not exist yet
+        // Device no longer exists in backend — clear stale IDs
+        console.warn('[ChildApp] loadStoredDevice: device not found, clearing IDs')
+        await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.DEVICE_ID)
+        await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.CHILD_ID)
       }
     }
   },

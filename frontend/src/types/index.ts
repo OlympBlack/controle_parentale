@@ -81,6 +81,8 @@ export interface Device {
   child_id: number | null
   name: string
   type: DeviceType
+  brand: string | null
+  model: string | null
   os: string | null
   os_version: string | null
   app_version: string | null
