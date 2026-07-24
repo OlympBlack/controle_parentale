@@ -39,7 +39,8 @@ export function RegisterScreen() {
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', padding: spacing['2xl'], paddingTop: 40, paddingBottom: 40 }}
-        {/* Logo */}
+        >
+          {/* Logo */}
         <View style={{ alignItems: 'center', marginBottom: spacing['3xl'] }}>
           <Image
             source={require('../../assets/safekid-logo.png')}
