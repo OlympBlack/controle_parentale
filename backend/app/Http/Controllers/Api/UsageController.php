@@ -9,6 +9,7 @@ use App\Http\Resources\LocationResource;
 use App\Http\Resources\UsageSessionResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\AppUsageSummary;
+use App\Models\Application;
 use App\Models\Child;
 use App\Models\Device;
 use App\Models\Location;
@@ -137,10 +138,10 @@ class UsageController extends Controller
             ->whereIn('device_id', $child->devices()->pluck('id'));
 
         if ($from = $request->get('from')) {
-            $query->where('date_utilisation', '>=', $from);
+            $query->whereDate('date_utilisation', '>=', $from);
         }
         if ($to = $request->get('to')) {
-            $query->where('date_utilisation', '<=', $to);
+            $query->whereDate('date_utilisation', '<=', $to);
         }
 
         $sessions = $query->orderBy('date_utilisation', 'desc')
@@ -159,12 +160,12 @@ class UsageController extends Controller
         $deviceIds = $child->devices()->pluck('id');
 
         $sessions = UsageSession::whereIn('device_id', $deviceIds)
-            ->where('date_utilisation', $today)
+            ->whereDate('date_utilisation', $today)
             ->orderBy('duree_secondes', 'desc')
             ->get();
 
         $summary = AppUsageSummary::whereIn('device_id', $deviceIds)
-            ->where('date', $today)
+            ->whereDate('date', $today)
             ->first();
 
         return $this->success([
@@ -214,15 +215,25 @@ class UsageController extends Controller
     private function updateDailySummary(int $deviceId, string $date): void
     {
         $sessions = UsageSession::where('device_id', $deviceId)
-            ->where('date_utilisation', $date)
+            ->whereDate('date_utilisation', $date)
             ->get();
 
-        AppUsageSummary::updateOrCreate(
-            ['device_id' => $deviceId, 'date' => $date],
-            [
+        $summary = AppUsageSummary::where('device_id', $deviceId)
+            ->whereDate('date', $date)
+            ->first();
+
+        if ($summary) {
+            $summary->update([
                 'temps_ecran_total_secondes' => $sessions->sum('duree_secondes'),
                 'nombre_apps_utilisees' => $sessions->count(),
-            ]
-        );
+            ]);
+        } else {
+            AppUsageSummary::create([
+                'device_id' => $deviceId,
+                'date' => $date,
+                'temps_ecran_total_secondes' => $sessions->sum('duree_secondes'),
+                'nombre_apps_utilisees' => $sessions->count(),
+            ]);
+        }
     }
 }
