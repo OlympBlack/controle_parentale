@@ -41,8 +41,8 @@ export default function App() {
     if (__DEV__) {
       console.log('[SafeKid] App started in DEV mode')
       console.log('[SafeKid] API URL:',
-        Constants.expoConfig?.extra?.apiUrl ||
         process.env.EXPO_PUBLIC_API_URL ||
+        Constants.expoConfig?.extra?.apiUrl ||
         'http://localhost:8000/api'
       )
     }
