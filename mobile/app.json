@@ -18,6 +18,7 @@
     },
     "android": {
       "package": "com.safekid.mobile",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -63,7 +64,7 @@
       "expo-task-manager"
     ],
     "extra": {
-      "apiUrl": "http://10.0.2.2:8000/api"
+      "apiUrl": "http://localhost:8000/api"
     }
   }
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Image, Linking } from 'react-native'
+import { View, Text, ScrollView, Pressable, Image, Linking, KeyboardAvoidingView, Platform } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AlertCircle, Check } from 'lucide-react-native'
 import { useNavigation } from '@react-navigation/native'
@@ -32,8 +32,15 @@ export function RegisterScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.brand[50] }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: spacing['2xl'] }}>
-        {/* Logo */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', padding: spacing['2xl'], paddingTop: 40, paddingBottom: 40 }}
+        >
+          {/* Logo */}
         <View style={{ alignItems: 'center', marginBottom: spacing['3xl'] }}>
           <Image
             source={require('../../assets/safekid-logo.png')}
@@ -130,6 +137,7 @@ export function RegisterScreen() {
           </Text>
         </Pressable>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }
